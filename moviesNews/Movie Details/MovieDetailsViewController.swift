@@ -6,12 +6,13 @@
 //
 
 import UIKit
-
+import Kingfisher
 class MovieDetailsViewController: UIViewController {
     
     var movidId = Int()
     var voteAvg:Int = 0
     private var imageView = UIImageView()
+    private var overviewView = CustomOverviewUiView()
     private var networkManager = NetworkManager.shared
     private lazy var genresCollection: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -33,19 +34,31 @@ class MovieDetailsViewController: UIViewController {
         scroll.contentInset = .zero
         return scroll
     }()
-    private var descriptionLabel: UILabel = {
-        let view = UILabel()
-        view.text = "Суд в Красноярске оштрафовал на 125 тысяч рублей военнослужащего, который пытался улететь в Таиланд по паспорту брата-близнеца. Мужчина предъявил документ на контроле в красноярском аэропорту Емельяново, его задержали. Суд признал его виновным в попытке незаконного пересечения границы (часть 3 статьи 30, часть 1 статьи 322 УК).Фото: пресс-служба Второго восточного окружного военного суда. Суд в Красноярске оштрафовал на 125 тысяч рублей военнослужащего, который пытался улететь в Таиланд по паспорту брата-близнеца. Мужчина предъявил документ на контроле в красноярском аэропорту Емельяново, его задержали. Суд признал его виновным в попытке незаконного пересечения границы (часть 3 статьи 30, часть 1 статьи 322 УК)."
-        view.numberOfLines = 0
-        return view
-    }()
     private let starsStack: UIStackView = {
         let stack = UIStackView()
         stack.alignment = .center
-        stack.distribution = .fillProportionally
+        stack.distribution = .fillEqually
         stack.axis = .horizontal
         stack.spacing = 4
-        stack.backgroundColor = .red
+        stack.backgroundColor = .clear
+        return stack
+    }()
+    private let genresAndReleaseStack: UIStackView = {
+        let stack = UIStackView()
+        stack.alignment = .center
+        stack.distribution = .fillProportionally
+        stack.axis = .vertical
+        stack.spacing = 4
+        stack.backgroundColor = .clear
+        return stack
+    }()
+    private let starsAndRatingStack: UIStackView = {
+        let stack = UIStackView()
+        stack.alignment = .center
+        stack.distribution = .fillProportionally
+        stack.axis = .vertical
+        stack.spacing = 4
+        stack.backgroundColor = .clear
         return stack
     }()
     private let youTubeImage: UIImageView = {
@@ -53,7 +66,82 @@ class MovieDetailsViewController: UIViewController {
         image.image = UIImage(named: "uTube")
         return image
     }()
+    private let allInfoStack: UIStackView = {
+        let stack = UIStackView()
+        stack.alignment = .center
+        stack.distribution = .fillEqually
+        stack.axis = .horizontal
+        stack.spacing = 4
+        stack.backgroundColor = .clear
+        return stack
+    }()
     private var contentView = UIView()
+    private var titleLabel: UILabel = {
+        let view = UILabel()
+        view.font = UIFont.systemFont(ofSize: 48, weight: .bold)
+        view.textAlignment = .center
+        view.textColor = .black
+        view.numberOfLines = 0
+        return view
+    }()
+    private var castLabel: UILabel = {
+        let view = UILabel()
+        view.font = UIFont.systemFont(ofSize: 36, weight: .bold)
+        view.textAlignment = .center
+        view.textColor = .black
+        view.text = "Cast"
+        view.numberOfLines = 1
+        return view
+    }()
+    private var releaseLabel: UILabel = {
+        let view = UILabel()
+        view.font = UIFont.systemFont(ofSize: 15, weight: .medium)
+        view.textAlignment = .center
+        view.textColor = .black
+        return view
+    }()
+    private var ratingLabel: UILabel = {
+        let view = UILabel()
+        view.font = UIFont.systemFont(ofSize: 15, weight: .medium)
+        view.textAlignment = .center
+        view.textColor = .black
+        return view
+    }()
+    private var votesLabel: UILabel = {
+        let view = UILabel()
+        view.font = UIFont.systemFont(ofSize: 10, weight: .medium)
+        view.textAlignment = .center
+        view.textColor = .black
+        return view
+    }()
+    private let ratingAndVotesStack: UIStackView = {
+        let stack = UIStackView()
+        stack.alignment = .center
+        stack.distribution = .fillProportionally
+        stack.axis = .vertical
+        stack.spacing = 2
+        stack.backgroundColor = .clear
+        return stack
+    }()
+    private lazy var castCollection: UICollectionView = {
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .horizontal
+        layout.sectionInset = UIEdgeInsets(top: 8, left: 16, bottom: 0, right: 16)
+        layout.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
+        let view = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        view.backgroundColor = .red
+        view.showsHorizontalScrollIndicator = false
+        view.register(CastCollectionViewCell.self, forCellWithReuseIdentifier: "CastCollectionViewCell")
+        view.delegate = self
+        view.dataSource = self
+        return view
+    }()
+    private lazy var cast:[CastElement] = [] {
+        didSet{
+            print(cast[0])
+            self.castCollection.reloadData()
+        }
+    }
     private lazy var genres:[Genre] = [] {
         didSet{
             self.genresCollection.reloadData()
@@ -71,11 +159,22 @@ class MovieDetailsViewController: UIViewController {
         view.addSubview(scrollView)
         scrollView.addSubview(contentView)
         view.backgroundColor = .white
-        contentView.addSubview(imageView)
-        contentView.addSubview(genresCollection)
-        contentView.addSubview(descriptionLabel)
-        contentView.addSubview(starsStack)
-        contentView.addSubview(youTubeImage)
+        [ratingLabel, votesLabel].forEach {
+            ratingAndVotesStack.addArrangedSubview($0)
+        }
+        [starsStack, ratingAndVotesStack].forEach {
+            starsAndRatingStack.addArrangedSubview($0)
+        }
+        [releaseLabel, genresCollection].forEach {
+            genresAndReleaseStack.addArrangedSubview($0)
+        }
+        [genresAndReleaseStack, starsAndRatingStack].forEach{
+            allInfoStack.addArrangedSubview($0)
+        }
+        [imageView, titleLabel, allInfoStack, overviewView, castLabel, castCollection].forEach {
+            contentView.addSubview($0)
+        }
+//        contentView.addSubview(youTubeImage)
         scrollView.snp.makeConstraints { make in
             make.top.equalTo(view.safeAreaLayoutGuide)
             make.leading.trailing.bottom.equalToSuperview()
@@ -86,33 +185,43 @@ class MovieDetailsViewController: UIViewController {
             make.centerX.equalTo(view.snp.centerX)
         }
         imageView.snp.makeConstraints {make in
-            make.height.equalTo(400)
-            make.width.equalTo(300)
+            make.height.equalTo(425)
+            make.width.equalTo(325)
             make.centerX.equalToSuperview()
-            make.top.equalTo(genresCollection.snp.bottom).offset(16)
-            
+            make.top.equalToSuperview().offset(8)
+        }
+        titleLabel.snp.makeConstraints { make in
+            make.centerX.equalToSuperview()
+            make.top.equalTo(imageView.snp.bottom).offset(8)
+            make.left.right.equalToSuperview()
+        }
+        genresAndReleaseStack.snp.makeConstraints { make in
+            make.top.bottom.equalToSuperview()
         }
         genresCollection.snp.makeConstraints { make in
-            make.top.equalToSuperview()
             make.leading.trailing.equalToSuperview()
             make.height.equalTo(40)
         }
-        descriptionLabel.snp.makeConstraints { make in
-            make.top.equalTo(imageView.snp.bottom).offset(16)
-            make.leading.trailing.equalToSuperview().offset(8)
-            make.height.greaterThanOrEqualTo(300)
-            
+        allInfoStack.snp.makeConstraints { make in
+            make.top.equalTo(titleLabel.snp.bottom).offset(8)
+            make.right.left.equalToSuperview()
         }
-        starsStack.snp.makeConstraints { make in
-            make.top.equalTo(descriptionLabel.snp.bottom).offset(16)
-            make.leading.trailing.equalToSuperview()
-            
+        overviewView.snp.makeConstraints { make in
+            make.top.equalTo(allInfoStack.snp.bottom).offset(8)
+            make.right.left.equalToSuperview()
         }
-        youTubeImage.snp.makeConstraints { make in
-            make.top.equalTo(starsStack.snp.bottom).offset(16)
+        starsAndRatingStack.snp.makeConstraints { make in
+            make.top.bottom.equalToSuperview()
+        }
+        castLabel.snp.makeConstraints { make in
+            make.top.equalTo(overviewView.snp.bottom).offset(16)
             make.centerX.equalToSuperview()
+            
+        }
+        castCollection.snp.makeConstraints { make in
+            make.top.equalTo(castLabel.snp.bottom).offset(8)
+            make.left.right.equalToSuperview()
             make.bottom.equalToSuperview()
-            make.height.width.equalTo(100)
         }
         let tapGR = UITapGestureRecognizer(target: self, action: #selector(self.imageTapped))
         youTubeImage.addGestureRecognizer(tapGR)
@@ -147,25 +256,26 @@ class MovieDetailsViewController: UIViewController {
             self?.voteAvg = Int(movieDetails.voteAverage ?? 0)
             self?.createStarsStack()
             self?.genres = movieDetails.genres
+            self?.titleLabel.text = movieDetails.originalTitle
+            self?.releaseLabel.text = "Release Date: \(movieDetails.releaseDate ?? "2022")"
+            self?.ratingLabel.text = " \(movieDetails.voteAverage ?? 0)/10"
+            self?.votesLabel.text = String(movieDetails.voteCount ?? 0)
+            self?.overviewView.configureView(with: "Overview", and: movieDetails.overview ?? "No overview")
             let urlString = "https://image.tmdb.org/t/p/w200" + (posterPath)
-           
             let url = URL(string: urlString)!
-            
-                DispatchQueue.global(qos: .userInitiated).async {
-                    if let data = try? Data(contentsOf: url) {
-                        DispatchQueue.main.async {
-                            self?.imageView.image = UIImage(data: data)
-                        }
-                    }
-            }
+            self!.imageView.kf.setImage(with: url)
+        }
+        networkManager.loadCastOfMovie(movieId: movidId) { [weak self] cast in
+            self?.cast = cast
         }
     }
     private func createStarsStack(){
         let voteFullStars: Int = voteAvg/2
-        
-        
         for _ in 0..<voteFullStars {
             let fullStar = UIImageView()
+            fullStar.snp.makeConstraints { make in
+                make.height.width.equalTo(20)
+            }
             fullStar.contentMode = .scaleToFill
             fullStar.image = UIImage(named: "full_star")
             starsStack.addArrangedSubview(fullStar)
@@ -174,6 +284,9 @@ class MovieDetailsViewController: UIViewController {
         for _ in 0..<leftEmptyStars {
             let emptyStar = UIImageView()
             emptyStar.image = UIImage(named: "empty_star")
+            emptyStar.snp.makeConstraints { make in
+                    make.height.width.equalTo(20)
+            }
             emptyStar.contentMode = .scaleToFill
             starsStack.addArrangedSubview(emptyStar)
         }
@@ -183,19 +296,34 @@ class MovieDetailsViewController: UIViewController {
 }
 extension MovieDetailsViewController: UICollectionViewDelegateFlowLayout, UICollectionViewDataSource, UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return genres.count
+        if collectionView == self.genresCollection{
+            return genres.count
+        }
+        else {
+            return cast.count
+        }
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = genresCollection.dequeueReusableCell(withReuseIdentifier: "GenresCollectionViewCell", for: indexPath) as! GenresCollectionViewCell
-        cell.configure(title: genres[indexPath.row].name)
+        if collectionView == self.castCollection{
+            let cell = castCollection.dequeueReusableCell(withReuseIdentifier: "CastCollectionViewCell", for: indexPath) as! CastCollectionViewCell
+            cell.configure(name: cast[indexPath.row].name, role: cast[indexPath.row].character ?? "No info", imagePath: cast[indexPath.row].profilePath ?? "noImage")
+            return cell
+        }
+        else {
+            let cell = genresCollection.dequeueReusableCell(withReuseIdentifier: "GenresCollectionViewCell", for: indexPath) as! GenresCollectionViewCell
+            cell.configure(title: genres[indexPath.row].name)
+            return cell
+        }
         
-        return cell
     }
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: 150, height: 35)
+        if collectionView == self.genresCollection{
+            return CGSize(width: 150, height: 35)
+        }
+        else {
+            return CGSize(width: 300, height: 80)
+        }
+        
     }
-  
-
-    
 }

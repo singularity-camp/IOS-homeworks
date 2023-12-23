@@ -14,21 +14,21 @@ class NetworkManager {
     private let apiKey: String = "d568b1ed6289cb2eb4c00ca0e87771ee"
     private let session = URLSession(configuration: .default)
     private lazy var urlComponents: URLComponents = {
-             var components = URLComponents()
-             components.scheme = "https"
-             components.host = "api.themoviedb.org"
-             components.queryItems = [
-                 URLQueryItem(name: "api_key", value: apiKey)
-             ]
-             return components
-         }()
+        var components = URLComponents()
+        components.scheme = "https"
+        components.host = "api.themoviedb.org"
+        components.queryItems = [
+            URLQueryItem(name: "api_key", value: apiKey)
+        ]
+        return components
+    }()
     
     func loadMovieLists(filter: String, completion: @escaping([Result]) -> Void){
         var components = urlComponents
         components.path = "/3/movie/\(filter)"
         guard let requestUrl = components.url else {
-                    return
-                }
+            return
+        }
         AF.request(requestUrl).responseJSON { response in
             guard let data = response.data else {
                 print("Error: did not get Data")
@@ -47,13 +47,36 @@ class NetworkManager {
         }
         
     }
+    func loadCastOfMovie(movieId:Int, completion: @escaping([CastElement]) -> Void){
+        var components = urlComponents
+        components.path = "/3/movie/\(movieId)/casts"
+        guard let requestUrl = components.url else {
+            return
+        }
+        AF.request(requestUrl).responseJSON { response in
+            guard let data = response.data else {
+                print("Error: did not get Data")
+                return
+            }
+            do{
+                let cast = try JSONDecoder().decode(Cast.self, from: data)
+                DispatchQueue.main.async {
+                    completion(cast.cast)
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    completion([])
+                }
+            }
+        }
+    }
     
     func loadGenres(completion: @escaping([Genre]) -> Void){
         var components = urlComponents
         components.path = "/3/genre/movie/list"
         guard let requestUrl = components.url else {
-                    return
-                }
+            return
+        }
         let task = session.dataTask(with: requestUrl) { data, response, error in
             guard error == nil else{
                 print("Error: error calling GET")

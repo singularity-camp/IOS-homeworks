@@ -247,13 +247,17 @@ extension MainViewController: UICollectionViewDelegateFlowLayout, UICollectionVi
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if collectionView == self.filterCollection {
             self.loadData(filter: filters[indexPath.row])
+            if let cell = collectionView.cellForItem(at: indexPath) as? GenresCollectionViewCell {
+                cell.backgroundColor = .systemRed
+            }
         }
         else {
             obtainMovieList(with: genres[indexPath.row].id)
+            if let cell = collectionView.cellForItem(at: indexPath) as? GenresCollectionViewCell {
+                cell.backgroundColor = .systemRed
+            }
         }
-        if let cell = collectionView.cellForItem(at: indexPath) as? GenresCollectionViewCell {
-            cell.backgroundColor = .systemRed
-        }
+        
         
     }
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
