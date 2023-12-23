@@ -8,12 +8,8 @@
 import UIKit
 
 class FilterCollectionViewCell: UICollectionViewCell {
-    var buttonLabel: UILabel = {
+    private var title: UILabel = {
         let label = UILabel()
-        label.layer.masksToBounds = true
-        label.layer.borderColor = UIColor.systemOrange.cgColor
-        label.layer.borderWidth = 1
-        label.layer.cornerRadius = 10
         label.textAlignment = .center
         label.font = UIFont.systemFont(ofSize: 20, weight: .regular)
         label.textColor = .white
@@ -22,17 +18,27 @@ class FilterCollectionViewCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        self.backgroundColor = .clear
-        self.addSubview(buttonLabel)
-        buttonLabel.snp.makeConstraints({make in
-            make.top.equalToSuperview()
-            make.bottom.equalToSuperview()
-            make.trailing.equalToSuperview()
-            make.leading.equalToSuperview()
-        })
+        setupViews()
             
     }
-        
+    
+    private func setupViews(){
+        contentView.backgroundColor = .clear
+        contentView.addSubview(title)
+        layer.masksToBounds = true
+        layer.cornerRadius = 11
+        layer.borderColor = UIColor.systemOrange.cgColor
+        layer.borderWidth = 1
+        title.snp.makeConstraints({make in
+            make.top.bottom.equalToSuperview().inset(4)
+            make.trailing.leading.equalToSuperview().inset(16)
+        })
+    }
+    
+    func configure(title: String){
+        self.title.text = title
+    }
+    
     required init?(coder aDecoder: NSCoder) {
             fatalError("init(coder:) has not been implemented")
     }

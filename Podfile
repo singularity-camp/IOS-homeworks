@@ -7,6 +7,9 @@ target 'moviesNews' do
 	
   # Pods for moviesNews
   pod 'SnapKit', '~> 5.0.0'
+  pod 'Kingfisher', '7.6.1'
+  pod 'Moya', '14.0.0'
+  pod 'Alamofire', '5.6.2'
 
   post_install do |installer|
     installer.pods_project.build_configurations.each do |config|

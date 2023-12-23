@@ -5,16 +5,10 @@
 //  Created by Диас Мухамедрахимов on 11.12.2023.
 //
 
-// This file was generated from JSON Schema using quicktype, do not modify it directly.
-// To parse the JSON, add this file to your project and do:
-//
-//   let movie = try? JSONDecoder().decode(Movie.self, from: jsonData)
-
 import Foundation
 
 // MARK: - Movie
 struct Movie: Codable {
-//    let dates: Dates
     let page: Int
     let results: [Result]
     let totalPages, totalResults: Int
@@ -26,10 +20,7 @@ struct Movie: Codable {
     }
 }
 
-// MARK: - Dates
-//struct Dates: Codable {
-//    let maximum, minimum: String
-//}
+
 
 // MARK: - Result
 struct Result: Codable {
@@ -61,8 +52,4 @@ struct Result: Codable {
     }
 }
 
-//enum OriginalLanguage: String, Codable {
-//    case en = "en"
-//    case ja = "ja"
-//    case uk = "uk"
-//}
+
