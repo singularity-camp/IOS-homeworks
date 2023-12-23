@@ -251,9 +251,25 @@ extension MainViewController: UICollectionViewDelegateFlowLayout, UICollectionVi
         else {
             obtainMovieList(with: genres[indexPath.row].id)
         }
+        if let cell = collectionView.cellForItem(at: indexPath) as? GenresCollectionViewCell {
+            cell.backgroundColor = .systemRed
+        }
         
     }
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSize(width: 150, height: 35)
+    }
+    func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
+        if collectionView == self.filterCollection {
+            if let cell = collectionView.cellForItem(at: indexPath) as? GenresCollectionViewCell {
+                cell.backgroundColor = .lightGray
+            }
+        }
+        else {
+            if let cell = collectionView.cellForItem(at: indexPath) as? GenresCollectionViewCell {
+                cell.backgroundColor = .blue
+            }
+        }
+        
     }
 }
