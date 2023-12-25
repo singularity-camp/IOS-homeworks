@@ -49,6 +49,7 @@ class MovieTableViewCell: UITableViewCell {
     required init?(coder aDecoder: NSCoder) {
             fatalError("init(coder:) has not been implemented")
     }
+    
     func configure(title: String, image: String, date: String, rating: Double){
         labelMovie.text = title
         dateLabel.text = date
@@ -87,5 +88,4 @@ class MovieTableViewCell: UITableViewCell {
             make.left.equalTo(imageMovie.snp.left).offset(8)
         })
     }
-
 }

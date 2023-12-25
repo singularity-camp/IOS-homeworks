@@ -19,7 +19,6 @@ class GenresCollectionViewCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupViews()
-            
     }
     
     private func setupViews(){

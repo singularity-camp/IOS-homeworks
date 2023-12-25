@@ -105,24 +105,22 @@ class MainViewController: UIViewController {
             self.genresCollection.isHidden = true
             isGenresShown = false
         }
-        
     }
     private func animate(){
-        UIView.animate(withDuration: 0.5, delay: 0.5) {
-            self.titleLabel.alpha = 1
-        } completion: { _ in
-            UIView.animate(withDuration: 0.7, delay: 0.3) {
+        UIView.animateKeyframes(withDuration: 2, delay: 0.5, animations: {
+            UIView.addKeyframe(withRelativeStartTime: 0.0, relativeDuration: 0.5, animations: {
+                self.titleLabel.alpha = 1
+            })
+            UIView.addKeyframe(withRelativeStartTime: 0.0, relativeDuration: 0.5, animations: {
                 self.titleLabel.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
-            } completion: { _ in
-                UIView.animate(withDuration: 0.45, delay: 0.45, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.8, options: .curveEaseIn) {
-                    self.invokeAnimatedTitleLabel()
-                } completion: { _ in
-                    UIView.animate(withDuration: 0.5, delay: 0.5) {
-                        self.containerView.alpha = 1
-                    }
-                }
-            }
-        }
+            })
+            UIView.addKeyframe(withRelativeStartTime: 0.0, relativeDuration: 0.5, animations: {
+                self.invokeAnimatedTitleLabel()
+            })
+            UIView.addKeyframe(withRelativeStartTime: 0.5, relativeDuration: 0.5, animations: {
+                self.containerView.alpha = 1
+            })
+        })
     }
     private func invokeAnimatedTitleLabel(){
         titleLabelYPosition.update(offset: -(view.safeAreaLayoutGuide.layoutFrame.height / 2 - 20))
@@ -130,6 +128,8 @@ class MainViewController: UIViewController {
     }
     private func setupViews() {
         view.backgroundColor = .white
+        self.navigationItem.backBarButtonItem = UIBarButtonItem(title:"", style:.plain, target:nil, action:nil)
+        self.navigationController?.navigationBar.tintColor = .black;
         showGenresButton.addTarget(self, action: #selector(showGenreTapped(_ :)), for: .touchUpInside)
         containerView.alpha = 0
         [titleLabel, containerView].forEach {
@@ -140,12 +140,6 @@ class MainViewController: UIViewController {
         }
         genresStack.addArrangedSubview(showGenresButton)
         genresStack.addArrangedSubview(genresCollection)
-        if #available(iOS 13.0, *) {
-            navigationController?.navigationBar.tintColor = .white
-        }
-        else {
-            print()
-        }
         showGenresButton.snp.makeConstraints { make in
             make.left.equalToSuperview().offset(10)
         }
@@ -179,6 +173,7 @@ class MainViewController: UIViewController {
     }
     func loadData(filter: Themes){
         networkManager.loadMovieLists(filter: filter.urlPaths) { [weak self] movies in
+            self?.allMovies = movies
             self?.movie = movies
         }
         networkManager.loadGenres { [weak self] genres in
@@ -192,18 +187,16 @@ class MainViewController: UIViewController {
             movie = allMovies
             return
         }
-        
         movie = allMovies.filter { movie in
             movie.genreIDS.contains(genreId)
         }
     }
-
 }
+
 extension MainViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         movie.count
     }
-    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = movieTableView.dequeueReusableCell(withIdentifier: "movieCell", for: indexPath) as! MovieTableViewCell
         let movie = movie[indexPath.row]
@@ -218,6 +211,7 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
         self.navigationController?.pushViewController(movieDetailsController, animated: true)
     }
 }
+
 extension MainViewController: UICollectionViewDelegateFlowLayout, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if collectionView == self.filterCollection {
@@ -227,7 +221,6 @@ extension MainViewController: UICollectionViewDelegateFlowLayout, UICollectionVi
             return genres.count
         }
     }
-    
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if collectionView == self.filterCollection {
             let cell = filterCollection.dequeueReusableCell(withReuseIdentifier: "filterCell", for: indexPath) as! GenresCollectionViewCell
@@ -242,7 +235,6 @@ extension MainViewController: UICollectionViewDelegateFlowLayout, UICollectionVi
             cell.configureCustonTitle(with: UIFont.systemFont(ofSize: 14))
             return cell
         }
-       
     }
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if collectionView == self.filterCollection {
@@ -257,8 +249,6 @@ extension MainViewController: UICollectionViewDelegateFlowLayout, UICollectionVi
                 cell.backgroundColor = .systemRed
             }
         }
-        
-        
     }
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSize(width: 150, height: 35)
@@ -274,6 +264,5 @@ extension MainViewController: UICollectionViewDelegateFlowLayout, UICollectionVi
                 cell.backgroundColor = .blue
             }
         }
-        
     }
 }

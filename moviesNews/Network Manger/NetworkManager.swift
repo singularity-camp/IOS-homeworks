@@ -45,7 +45,6 @@ class NetworkManager {
                 }
             }
         }
-        
     }
     func loadCastOfMovie(movieId:Int, completion: @escaping([CastElement]) -> Void){
         var components = urlComponents
@@ -77,17 +76,9 @@ class NetworkManager {
         guard let requestUrl = components.url else {
             return
         }
-        let task = session.dataTask(with: requestUrl) { data, response, error in
-            guard error == nil else{
-                print("Error: error calling GET")
-                return
-            }
-            guard let data else {
+        AF.request(requestUrl).responseJSON { response in
+            guard let data = response.data else {
                 print("Error: did not get Data")
-                return
-            }
-            guard let response = response as? HTTPURLResponse, (200 ..< 300) ~= response.statusCode else {
-                print("Error: Http request failed")
                 return
             }
             do{
@@ -97,31 +88,21 @@ class NetworkManager {
                 }
             } catch {
                 DispatchQueue.main.async {
-                    print("error")
+                    print("No json!")
                 }
             }
-           
         }
-        task.resume()
     }
     
     func loadMovieDetails(id: Int, completion: @escaping(MovieDetails) -> Void){
         var components = urlComponents
         components.path = "/3/movie/\(id)"
         guard let requestUrl = components.url else {
-                    return
-                }
-        let task = session.dataTask(with: requestUrl) { data, response, error in
-            guard error == nil else{
-                print("Error: error calling GET")
-                return
-            }
-            guard let data else {
+            return
+        }
+        AF.request(requestUrl).responseJSON { response in
+            guard let data = response.data else {
                 print("Error: did not get Data")
-                return
-            }
-            guard let response = response as? HTTPURLResponse, (200 ..< 300) ~= response.statusCode else {
-                print("Error: Http request failed")
                 return
             }
             do{
@@ -131,45 +112,149 @@ class NetworkManager {
                 }
             } catch {
                 DispatchQueue.main.async {
-                    print("error")
+                    print("No json!")
                 }
             }
-           
         }
-        task.resume()
     }
     func loadMovieDetailsVideos(id: Int, completion: @escaping([Video]) -> Void){
         var components = urlComponents
         components.path = "/3/movie/\(id)/videos"
         guard let requestUrl = components.url else {
-                    return
-                }
-        let task = session.dataTask(with: requestUrl) { data, response, error in
-            guard error == nil else{
-                print("Error: error calling GET")
-                return
-            }
-            guard let data else {
+            return
+        }
+        AF.request(requestUrl).responseJSON { response in
+            guard let data = response.data else {
                 print("Error: did not get Data")
                 return
             }
-            guard let response = response as? HTTPURLResponse, (200 ..< 300) ~= response.statusCode else {
-                print("Error: Http request failed")
-                return
-            }
             do{
-                let movieDetails = try JSONDecoder().decode(VideoEntity.self, from: data)
+                let video = try JSONDecoder().decode(VideoEntity.self, from: data)
                 DispatchQueue.main.async {
-                    completion(movieDetails.results)
+                    completion(video.results)
                 }
             } catch {
                 DispatchQueue.main.async {
-                    print("error")
+                    completion([])
                 }
             }
-           
         }
-        task.resume()
     }
-    
+    func loadMovieDetailsExternalIds(id: Int, completion: @escaping(ExterndalIds) -> Void){
+        var components = urlComponents
+        components.path = "/3/movie/\(id)/external_ids"
+        guard let requestUrl = components.url else {
+            return
+        }
+        AF.request(requestUrl).responseJSON { response in
+            guard let data = response.data else {
+                print("Error: did not get Data")
+                return
+            }
+            do{
+                let externalIds = try JSONDecoder().decode(ExterndalIds.self, from: data)
+                DispatchQueue.main.async {
+                    completion(externalIds)
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    print("No json!")
+                }
+            }
+        }
+    }
+    func loadCastDetails(id: Int, completion: @escaping(Actor) -> Void){
+        var components = urlComponents
+        components.path = "/3/person/\(id)"
+        guard let requestUrl = components.url else {
+            return
+        }
+        AF.request(requestUrl).responseJSON { response in
+            guard let data = response.data else {
+                print("Error: did not get Data")
+                return
+            }
+            do{
+                let actorDetails = try JSONDecoder().decode(Actor.self, from: data)
+                DispatchQueue.main.async {
+                    completion(actorDetails)
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    print("No json!")
+                }
+            }
+        }
+    }
+    func loadPhotosOfActor(id: Int, completion: @escaping([Profile]) -> Void){
+        var components = urlComponents
+        components.path = "/3/person/\(id)/images"
+        guard let requestUrl = components.url else {
+            return
+        }
+        AF.request(requestUrl).responseJSON { response in
+            guard let data = response.data else {
+                print("Error: did not get Data")
+                return
+            }
+            do{
+                let photos = try JSONDecoder().decode(Photos.self, from: data)
+                print(photos)
+                DispatchQueue.main.async {
+                    completion(photos.profiles)
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    print("No json!")
+                }
+            }
+        }
+    }
+    func loadMoviesOfActor(id: Int, completion: @escaping([Movies]) -> Void){
+        var components = urlComponents
+        components.path = "/3/person/\(id)/movie_credits"
+        guard let requestUrl = components.url else {
+            return
+        }
+        AF.request(requestUrl).responseJSON { response in
+            guard let data = response.data else {
+                print("Error: did not get Data")
+                return
+            }
+            do{
+                let movies = try JSONDecoder().decode(MoviesOfActor.self, from: data)
+                print(movies)
+                DispatchQueue.main.async {
+                    completion(movies.cast)
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    print("No json!")
+                }
+            }
+        }
+    }
+    func loadActorsExternalIds(id: Int, completion: @escaping(ActorsExternalIds) -> Void){
+        var components = urlComponents
+        components.path = "/3/person/\(id)/external_ids"
+        guard let requestUrl = components.url else {
+            return
+        }
+        AF.request(requestUrl).responseJSON { response in
+            guard let data = response.data else {
+                print("Error: did not get Data")
+                return
+            }
+            do{
+                let externalIds = try JSONDecoder().decode(ActorsExternalIds.self, from: data)
+                DispatchQueue.main.async {
+                    completion(externalIds)
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    print("No json!")
+                }
+            }
+        }
+    }
 }

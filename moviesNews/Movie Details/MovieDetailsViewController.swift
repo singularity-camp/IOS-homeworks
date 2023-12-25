@@ -66,6 +66,25 @@ class MovieDetailsViewController: UIViewController {
         image.image = UIImage(named: "uTube")
         return image
     }()
+    private let imdbImage: UIImageView = {
+        let image = UIImageView()
+        image.image = UIImage(named: "imdb")
+        return image
+    }()
+    private let facebookImage: UIImageView = {
+        let image = UIImageView()
+        image.image = UIImage(named: "facebook")
+        return image
+    }()
+    private let socialMediasStack: UIStackView = {
+        let stack = UIStackView()
+        stack.alignment = .center
+        stack.distribution = .equalCentering
+        stack.axis = .horizontal
+        stack.spacing = 4
+        stack.backgroundColor = .clear
+        return stack
+    }()
     private let allInfoStack: UIStackView = {
         let stack = UIStackView()
         stack.alignment = .center
@@ -90,6 +109,15 @@ class MovieDetailsViewController: UIViewController {
         view.textAlignment = .center
         view.textColor = .black
         view.text = "Cast"
+        view.numberOfLines = 1
+        return view
+    }()
+    private var linksLabel: UILabel = {
+        let view = UILabel()
+        view.font = UIFont.systemFont(ofSize: 36, weight: .bold)
+        view.textAlignment = .center
+        view.textColor = .black
+        view.text = "Links"
         view.numberOfLines = 1
         return view
     }()
@@ -126,10 +154,9 @@ class MovieDetailsViewController: UIViewController {
     private lazy var castCollection: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
-        layout.sectionInset = UIEdgeInsets(top: 8, left: 16, bottom: 0, right: 16)
-        layout.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
+        layout.sectionInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
         let view = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        view.backgroundColor = .red
+        view.backgroundColor = .clear
         view.showsHorizontalScrollIndicator = false
         view.register(CastCollectionViewCell.self, forCellWithReuseIdentifier: "CastCollectionViewCell")
         view.delegate = self
@@ -138,7 +165,6 @@ class MovieDetailsViewController: UIViewController {
     }()
     private lazy var cast:[CastElement] = [] {
         didSet{
-            print(cast[0])
             self.castCollection.reloadData()
         }
     }
@@ -152,10 +178,15 @@ class MovieDetailsViewController: UIViewController {
         super.viewDidLoad()
         setupViews()
         loadData()
-        // Do any additional setup after loading the view.
+    }
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        let textAttributes = [NSAttributedString.Key.foregroundColor:UIColor.black]
+        self.navigationController?.navigationBar.titleTextAttributes = textAttributes
+        self.navigationItem.backBarButtonItem = UIBarButtonItem(title:"", style:.plain, target:nil, action:nil)
+        self.navigationController?.navigationBar.tintColor = .black;
     }
     func setupViews(){
-        self.title = "Movie"
         view.addSubview(scrollView)
         scrollView.addSubview(contentView)
         view.backgroundColor = .white
@@ -171,10 +202,12 @@ class MovieDetailsViewController: UIViewController {
         [genresAndReleaseStack, starsAndRatingStack].forEach{
             allInfoStack.addArrangedSubview($0)
         }
-        [imageView, titleLabel, allInfoStack, overviewView, castLabel, castCollection].forEach {
+        [imdbImage, youTubeImage, facebookImage].forEach {
+            socialMediasStack.addArrangedSubview($0)
+        }
+        [imageView, titleLabel, allInfoStack, overviewView, castLabel, castCollection, linksLabel, socialMediasStack].forEach {
             contentView.addSubview($0)
         }
-//        contentView.addSubview(youTubeImage)
         scrollView.snp.makeConstraints { make in
             make.top.equalTo(view.safeAreaLayoutGuide)
             make.leading.trailing.bottom.equalToSuperview()
@@ -216,21 +249,34 @@ class MovieDetailsViewController: UIViewController {
         castLabel.snp.makeConstraints { make in
             make.top.equalTo(overviewView.snp.bottom).offset(16)
             make.centerX.equalToSuperview()
-            
         }
         castCollection.snp.makeConstraints { make in
             make.top.equalTo(castLabel.snp.bottom).offset(8)
             make.left.right.equalToSuperview()
+            make.height.equalTo(100)
+        }
+        linksLabel.snp.makeConstraints { make in
+            make.top.equalTo(castCollection.snp.bottom).offset(16)
+            make.centerX.equalToSuperview()
+        }
+        socialMediasStack.snp.makeConstraints { make in
+            make.top.equalTo(linksLabel.snp.bottom).offset(8)
+            make.left.right.equalToSuperview().inset(28)
+            make.height.equalTo(50)
             make.bottom.equalToSuperview()
         }
-        let tapGR = UITapGestureRecognizer(target: self, action: #selector(self.imageTapped))
-        youTubeImage.addGestureRecognizer(tapGR)
+        let tapGRUTube = UITapGestureRecognizer(target: self, action: #selector(self.youTubeTapped))
+        youTubeImage.addGestureRecognizer(tapGRUTube)
         youTubeImage.isUserInteractionEnabled = true
-        
-        
+        let tapGRImdb = UITapGestureRecognizer(target: self, action: #selector(self.imdbTapped))
+        imdbImage.addGestureRecognizer(tapGRImdb)
+        imdbImage.isUserInteractionEnabled = true
+        let tapGRFacebook = UITapGestureRecognizer(target: self, action: #selector(self.facebookTapped))
+        facebookImage.addGestureRecognizer(tapGRFacebook)
+        facebookImage.isUserInteractionEnabled = true
     }
     
-    @objc func imageTapped(){
+    @objc func youTubeTapped(){
         networkManager.loadMovieDetailsVideos(id: movidId) {  videos in
             let uTubeVideos = videos.filter {video in
                 if let site = video.webSite {
@@ -239,7 +285,6 @@ class MovieDetailsViewController: UIViewController {
                     .init()
                 }
             }
-                
             guard let key = videos.first?.key else {
                 return
             }
@@ -247,16 +292,39 @@ class MovieDetailsViewController: UIViewController {
             if let url = URL(string: urlString){
                 UIApplication.shared.open(url)
             }
+        }
+    }
+    @objc func imdbTapped(){
+        networkManager.loadMovieDetailsExternalIds(id: movidId) { ids in
+            guard let id = ids.imdb else {
+                return
+            }
+            let urlString = "https://www.imdb.com/title/" + id
+            if let url = URL(string: urlString){
+                UIApplication.shared.open(url)
             }
         }
+    }
+    @objc func facebookTapped(){
+        networkManager.loadMovieDetailsExternalIds(id: movidId) { ids in
+            guard let id = ids.facebook else {
+                return
+            }
+            let urlString = "https://www.facebook.com/" + id
+            if let url = URL(string: urlString){
+                UIApplication.shared.open(url)
+            }
+        }
+    }
     
     private func loadData(){
         networkManager.loadMovieDetails(id: movidId) { [weak self] movieDetails in
             guard let posterPath = movieDetails.posterPath else{return}
-            self?.voteAvg = Int(movieDetails.voteAverage ?? 0)
+            self?.voteAvg = Int(round(movieDetails.voteAverage ?? 0))
             self?.createStarsStack()
             self?.genres = movieDetails.genres
             self?.titleLabel.text = movieDetails.originalTitle
+            self?.title = movieDetails.originalTitle
             self?.releaseLabel.text = "Release Date: \(movieDetails.releaseDate ?? "2022")"
             self?.ratingLabel.text = " \(movieDetails.voteAverage ?? 0)/10"
             self?.votesLabel.text = String(movieDetails.voteCount ?? 0)
@@ -266,11 +334,14 @@ class MovieDetailsViewController: UIViewController {
             self!.imageView.kf.setImage(with: url)
         }
         networkManager.loadCastOfMovie(movieId: movidId) { [weak self] cast in
-            self?.cast = cast
+            cast.forEach { cast in
+                self?.cast.append(cast)
+            }
         }
     }
     private func createStarsStack(){
         let voteFullStars: Int = voteAvg/2
+        let remainOfStars: Int = voteAvg % 2
         for _ in 0..<voteFullStars {
             let fullStar = UIImageView()
             fullStar.snp.makeConstraints { make in
@@ -280,19 +351,27 @@ class MovieDetailsViewController: UIViewController {
             fullStar.image = UIImage(named: "full_star")
             starsStack.addArrangedSubview(fullStar)
         }
-        let leftEmptyStars: Int = 5 - voteFullStars
+        var leftEmptyStars: Int = 5 - voteFullStars
+        if remainOfStars > 0 {
+            let halfStar = UIImageView()
+            halfStar.image = UIImage(named: "half_star")
+            halfStar.snp.makeConstraints { make in
+                make.height.width.equalTo(20)
+            }
+            halfStar.contentMode = .scaleToFill
+            starsStack.addArrangedSubview(halfStar)
+            leftEmptyStars = leftEmptyStars - 1
+        }
         for _ in 0..<leftEmptyStars {
             let emptyStar = UIImageView()
             emptyStar.image = UIImage(named: "empty_star")
             emptyStar.snp.makeConstraints { make in
-                    make.height.width.equalTo(20)
+                make.height.width.equalTo(20)
             }
             emptyStar.contentMode = .scaleToFill
             starsStack.addArrangedSubview(emptyStar)
         }
-        
     }
-  
 }
 extension MovieDetailsViewController: UICollectionViewDelegateFlowLayout, UICollectionViewDataSource, UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -303,9 +382,8 @@ extension MovieDetailsViewController: UICollectionViewDelegateFlowLayout, UIColl
             return cast.count
         }
     }
-    
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        if collectionView == self.castCollection{
+        if collectionView == self.castCollection {
             let cell = castCollection.dequeueReusableCell(withReuseIdentifier: "CastCollectionViewCell", for: indexPath) as! CastCollectionViewCell
             cell.configure(name: cast[indexPath.row].name, role: cast[indexPath.row].character ?? "No info", imagePath: cast[indexPath.row].profilePath ?? "noImage")
             return cell
@@ -315,15 +393,21 @@ extension MovieDetailsViewController: UICollectionViewDelegateFlowLayout, UIColl
             cell.configure(title: genres[indexPath.row].name)
             return cell
         }
-        
     }
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         if collectionView == self.genresCollection{
             return CGSize(width: 150, height: 35)
         }
         else {
-            return CGSize(width: 300, height: 80)
+            return CGSize(width: 200, height: 80)
         }
-        
+    }
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        if collectionView == self.castCollection{
+            let actorDetails = ActorDetailsViewController()
+            let actor = cast[indexPath.row]
+            actorDetails.actorId = actor.id
+            navigationController?.pushViewController(actorDetails, animated: true)
+        }
     }
 }
