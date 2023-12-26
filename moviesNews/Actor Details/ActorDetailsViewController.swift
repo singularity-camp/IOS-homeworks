@@ -11,7 +11,8 @@ class ActorDetailsViewController: UIViewController {
     
     private var networkManager = NetworkManager.shared
     var actorId = Int()
-    var allPhotosCount = Int()
+    private var allPhotosCount = Int()
+    private var lastPhotoIndex = Int()
     private var imageView = UIImageView()
     private var biographyView = CustomOverviewUiView()
     private var scrollView: UIScrollView = {
@@ -267,8 +268,17 @@ class ActorDetailsViewController: UIViewController {
             self?.biographyView.configureView(with: "Biography", and: actorDetails.biography ?? "No bio yet")
         }
         networkManager.loadPhotosOfActor(id: actorId) {[weak self] photos in
-            for i in 0...3 {
-                self?.photos.append(photos[i])
+            if photos.count > 4 {
+                for i in 0...3 {
+                    self?.photos.append(photos[i])
+                }
+                self?.lastPhotoIndex = 3
+            }
+            else {
+                for i in 0...(photos.count-1){
+                    self?.photos.append(photos[i])
+                }
+                self?.lastPhotoIndex = photos.count - 1
             }
             self?.allPhotosCount = photos.count
         }
@@ -293,11 +303,21 @@ extension ActorDetailsViewController: UICollectionViewDelegateFlowLayout, UIColl
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if collectionView == photosOfActorCollection{
             let cell = photosOfActorCollection.dequeueReusableCell(withReuseIdentifier: "ActorPhotosCollectionViewCell", for: indexPath) as! ActorPhotosCollectionViewCell
-            if indexPath.row != 3 {
-                cell.configure(plus: "", imagePath: photos[indexPath.row].filePath, alpha: 1.0)
+            if allPhotosCount > 4 {
+                if indexPath.row != 3 {
+                    cell.configure(plus: "", imagePath: photos[indexPath.row].filePath, alpha: 1.0)
+                }
+                else {
+                    cell.configure(plus: "+\(allPhotosCount - 4)", imagePath: photos[indexPath.row].filePath, alpha: 0.5)
+                }
             }
             else {
-                cell.configure(plus: "+\(allPhotosCount - 4)", imagePath: photos[indexPath.row].filePath, alpha: 0.5)
+                if indexPath.row != allPhotosCount - 1 {
+                    cell.configure(plus: "", imagePath: photos[indexPath.row].filePath, alpha: 1.0)
+                }
+                else {
+                    cell.configure(plus: "+1", imagePath: photos[indexPath.row].filePath, alpha: 0.5)
+                }
             }
             return cell
         }
@@ -317,7 +337,7 @@ extension ActorDetailsViewController: UICollectionViewDelegateFlowLayout, UIColl
     }
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if collectionView == photosOfActorCollection {
-            if indexPath.row == 3 {
+            if indexPath.row == lastPhotoIndex {
                 let gallery = GalleryViewController()
                 gallery.actorId = actorId
                 gallery.allPhotosCount = allPhotosCount
