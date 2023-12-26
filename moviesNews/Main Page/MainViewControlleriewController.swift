@@ -16,6 +16,8 @@ class MainViewController: UIViewController {
         }
     }
     private var tappedGenreId: Int? = nil
+    private var firstIndexPathOfGenres = IndexPath()
+    private var firstIndexPathOfFillters = IndexPath()
     private var titleLabel: UILabel = {
         let view = UILabel()
         view.font = UIFont.systemFont(ofSize: 36, weight: .bold)
@@ -234,6 +236,7 @@ extension MainViewController: UICollectionViewDelegateFlowLayout, UICollectionVi
             cell.configure(title: filters[indexPath.row].key)
             if indexPath.row == 0 {
                 cell.backgroundColor = .systemRed
+                firstIndexPathOfFillters = indexPath
             }
             else {
                 cell.backgroundColor = .lightGray
@@ -247,6 +250,7 @@ extension MainViewController: UICollectionViewDelegateFlowLayout, UICollectionVi
             cell.configureCustonTitle(with: UIFont.systemFont(ofSize: 14))
             if indexPath.row == 0 {
                 cell.backgroundColor = .systemRed
+                firstIndexPathOfGenres = indexPath
             }
             return cell
         }
@@ -255,12 +259,22 @@ extension MainViewController: UICollectionViewDelegateFlowLayout, UICollectionVi
         if collectionView == self.filterCollection {
             loadData(filter: filters[indexPath.row], genreId: tappedGenreId)
             if let cell = collectionView.cellForItem(at: indexPath) as? GenresCollectionViewCell {
+                if indexPath.row != 0 {
+                    if let firstCell = collectionView.cellForItem(at: firstIndexPathOfFillters) as? GenresCollectionViewCell{
+                        firstCell.backgroundColor = .lightGray
+                    }
+                }
                 cell.backgroundColor = .systemRed
             }
         }
         else {
             obtainMovieList(with: genres[indexPath.row].id)
             if let cell = collectionView.cellForItem(at: indexPath) as? GenresCollectionViewCell {
+                if indexPath.row != 0 {
+                    if let firstCell = collectionView.cellForItem(at: firstIndexPathOfGenres) as? GenresCollectionViewCell{
+                        firstCell.backgroundColor = .blue
+                    }
+                }
                 cell.backgroundColor = .systemRed
             }
             tappedGenreId = genres[indexPath.row].id
