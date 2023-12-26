@@ -15,6 +15,7 @@ class MainViewController: UIViewController {
             self.movieTableView.reloadData()
         }
     }
+    private var tappedGenreId: Int? = nil
     private var titleLabel: UILabel = {
         let view = UILabel()
         view.font = UIFont.systemFont(ofSize: 36, weight: .bold)
@@ -90,7 +91,7 @@ class MainViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupViews()
-        loadData(filter: .popular)
+        loadData(filter: .nowPlaying, genreId: tappedGenreId)
     }
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
@@ -171,10 +172,16 @@ class MainViewController: UIViewController {
             make.leading.trailing.bottom.equalToSuperview()
         }
     }
-    func loadData(filter: Themes){
+    func loadData(filter: Themes, genreId: Int?){
         networkManager.loadMovieLists(filter: filter.urlPaths) { [weak self] movies in
             self?.allMovies = movies
-            self?.movie = movies
+            if let genreId = genreId {
+                self?.obtainMovieList(with: genreId)
+            }
+            else {
+                self?.movie = movies
+            }
+            
         }
         networkManager.loadGenres { [weak self] genres in
             genres.forEach { genre in
@@ -225,7 +232,12 @@ extension MainViewController: UICollectionViewDelegateFlowLayout, UICollectionVi
         if collectionView == self.filterCollection {
             let cell = filterCollection.dequeueReusableCell(withReuseIdentifier: "filterCell", for: indexPath) as! GenresCollectionViewCell
             cell.configure(title: filters[indexPath.row].key)
-            cell.backgroundColor = .lightGray
+            if indexPath.row == 0 {
+                cell.backgroundColor = .systemRed
+            }
+            else {
+                cell.backgroundColor = .lightGray
+            }
             cell.configureCustonTitle(with: UIFont.systemFont(ofSize: 14))
             return cell
         }
@@ -233,12 +245,15 @@ extension MainViewController: UICollectionViewDelegateFlowLayout, UICollectionVi
             let cell = genresCollection.dequeueReusableCell(withReuseIdentifier: "genreCell", for: indexPath) as! GenresCollectionViewCell
             cell.configure(title: genres[indexPath.row].name)
             cell.configureCustonTitle(with: UIFont.systemFont(ofSize: 14))
+            if indexPath.row == 0 {
+                cell.backgroundColor = .systemRed
+            }
             return cell
         }
     }
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if collectionView == self.filterCollection {
-            self.loadData(filter: filters[indexPath.row])
+            loadData(filter: filters[indexPath.row], genreId: tappedGenreId)
             if let cell = collectionView.cellForItem(at: indexPath) as? GenresCollectionViewCell {
                 cell.backgroundColor = .systemRed
             }
@@ -248,6 +263,7 @@ extension MainViewController: UICollectionViewDelegateFlowLayout, UICollectionVi
             if let cell = collectionView.cellForItem(at: indexPath) as? GenresCollectionViewCell {
                 cell.backgroundColor = .systemRed
             }
+            tappedGenreId = genres[indexPath.row].id
         }
     }
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
