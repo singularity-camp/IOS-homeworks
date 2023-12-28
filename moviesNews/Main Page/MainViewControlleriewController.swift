@@ -99,6 +99,8 @@ class MainViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         animate()
+        self.filterCollection.selectItem(at: IndexPath(row: 0, section: 0), animated: false, scrollPosition: .top)
+        self.genresCollection.selectItem(at: IndexPath(row: 0, section: 0), animated: false, scrollPosition: .top)
     }
     @objc func showGenreTapped(_ sender: UIButton){
         if !isGenresShown {
@@ -185,7 +187,6 @@ class MainViewController: UIViewController {
                 self?.movie = movies
             }
         }
-        
     }
     func loadGenres(){
         networkManager.loadGenres { [weak self] genres in
@@ -236,66 +237,27 @@ extension MainViewController: UICollectionViewDelegateFlowLayout, UICollectionVi
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if collectionView == self.filterCollection {
             let cell = filterCollection.dequeueReusableCell(withReuseIdentifier: "filterCell", for: indexPath) as! GenresCollectionViewCell
-            cell.configure(title: filters[indexPath.row].key)
-            if indexPath.row == 0 {
-                cell.backgroundColor = .systemRed
-                firstIndexPathOfFillters = indexPath
-            }
-            else {
-                cell.backgroundColor = .lightGray
-            }
+            cell.configure(title: filters[indexPath.row].key, selectedBackgroundColor: .systemRed, unselectedBackgroundColor: .lightGray)
             cell.configureCustonTitle(with: UIFont.systemFont(ofSize: 14))
             return cell
         }
         else {
             let cell = genresCollection.dequeueReusableCell(withReuseIdentifier: "genreCell", for: indexPath) as! GenresCollectionViewCell
-            cell.configure(title: genres[indexPath.row].name)
+            cell.configure(title: genres[indexPath.row].name, selectedBackgroundColor: .systemRed, unselectedBackgroundColor: .blue)
             cell.configureCustonTitle(with: UIFont.systemFont(ofSize: 14))
-            if indexPath.row == 0 && indexPath.section == 0 {
-                cell.backgroundColor = .systemRed
-                firstIndexPathOfGenres = indexPath
-            }
             return cell
         }
     }
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if collectionView == self.filterCollection {
             loadData(filter: filters[indexPath.row], genreId: tappedGenreId)
-            if let cell = collectionView.cellForItem(at: indexPath) as? GenresCollectionViewCell {
-                if indexPath.row != 0 {
-                    if let firstCell = collectionView.cellForItem(at: firstIndexPathOfFillters) as? GenresCollectionViewCell{
-                        firstCell.backgroundColor = .lightGray
-                    }
-                }
-                cell.backgroundColor = .systemRed
-            }
         }
-        if  collectionView == self.genresCollection {
+        if collectionView == self.genresCollection {
             obtainMovieList(with: genres[indexPath.row].id)
-            if let cell = collectionView.cellForItem(at: indexPath) as? GenresCollectionViewCell {
-                if indexPath.row != 0 {
-                    if let firstCell = collectionView.cellForItem(at: firstIndexPathOfGenres) as? GenresCollectionViewCell{
-                        firstCell.backgroundColor = .blue
-                    }
-                }
-                cell.backgroundColor = .systemRed
-            }
             tappedGenreId = genres[indexPath.row].id
         }
     }
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSize(width: 150, height: 35)
-    }
-    func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
-        if collectionView == self.filterCollection {
-            if let cell = collectionView.cellForItem(at: indexPath) as? GenresCollectionViewCell {
-                cell.backgroundColor = .lightGray
-            }
-        }
-        if  collectionView == self.genresCollection {
-            if let cell = collectionView.cellForItem(at: indexPath) as? GenresCollectionViewCell {
-                cell.backgroundColor = .blue
-            }
-        }
     }
 }

@@ -15,6 +15,8 @@ class GenresCollectionViewCell: UICollectionViewCell {
         label.textColor = .white
         return label
     }()
+    var selectedBackgroundColor = UIColor.systemRed
+    var unselectedBackgroundColor = UIColor.clear
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -26,7 +28,7 @@ class GenresCollectionViewCell: UICollectionViewCell {
         contentView.addSubview(title)
         layer.masksToBounds = true
         layer.cornerRadius = 11
-        backgroundColor = .blue
+        backgroundColor = unselectedBackgroundColor
         title.snp.makeConstraints({make in
             make.top.bottom.equalToSuperview().inset(4)
             make.trailing.leading.equalToSuperview().inset(16)
@@ -36,11 +38,20 @@ class GenresCollectionViewCell: UICollectionViewCell {
     func configureCustonTitle(with font: UIFont){
         self.title.font = font
     }
-    func configure(title: String){
+    func configure(title: String, selectedBackgroundColor: UIColor, unselectedBackgroundColor:UIColor){
         self.title.text = title
+        self.selectedBackgroundColor = selectedBackgroundColor
+        self.backgroundColor = unselectedBackgroundColor
+        self.unselectedBackgroundColor = unselectedBackgroundColor
     }
     
     required init?(coder aDecoder: NSCoder) {
             fatalError("init(coder:) has not been implemented")
+    }
+    
+    override var isSelected: Bool {
+        didSet {
+            backgroundColor = isSelected ? selectedBackgroundColor : unselectedBackgroundColor
+        }
     }
 }

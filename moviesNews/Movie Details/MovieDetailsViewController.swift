@@ -390,7 +390,7 @@ extension MovieDetailsViewController: UICollectionViewDelegateFlowLayout, UIColl
         }
         else {
             let cell = genresCollection.dequeueReusableCell(withReuseIdentifier: "GenresCollectionViewCell", for: indexPath) as! GenresCollectionViewCell
-            cell.configure(title: genres[indexPath.row].name)
+            cell.configure(title: genres[indexPath.row].name, selectedBackgroundColor: .red, unselectedBackgroundColor: .blue)
             return cell
         }
     }
