@@ -94,6 +94,7 @@ class MainViewController: UIViewController {
         super.viewDidLoad()
         setupViews()
         loadData(filter: .nowPlaying, genreId: tappedGenreId)
+        loadGenres()
     }
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
@@ -183,8 +184,10 @@ class MainViewController: UIViewController {
             else {
                 self?.movie = movies
             }
-            
         }
+        
+    }
+    func loadGenres(){
         networkManager.loadGenres { [weak self] genres in
             genres.forEach { genre in
                 self?.genres.append(genre)
@@ -248,7 +251,7 @@ extension MainViewController: UICollectionViewDelegateFlowLayout, UICollectionVi
             let cell = genresCollection.dequeueReusableCell(withReuseIdentifier: "genreCell", for: indexPath) as! GenresCollectionViewCell
             cell.configure(title: genres[indexPath.row].name)
             cell.configureCustonTitle(with: UIFont.systemFont(ofSize: 14))
-            if indexPath.row == 0 {
+            if indexPath.row == 0 && indexPath.section == 0 {
                 cell.backgroundColor = .systemRed
                 firstIndexPathOfGenres = indexPath
             }
@@ -267,7 +270,7 @@ extension MainViewController: UICollectionViewDelegateFlowLayout, UICollectionVi
                 cell.backgroundColor = .systemRed
             }
         }
-        else {
+        if  collectionView == self.genresCollection {
             obtainMovieList(with: genres[indexPath.row].id)
             if let cell = collectionView.cellForItem(at: indexPath) as? GenresCollectionViewCell {
                 if indexPath.row != 0 {
@@ -289,7 +292,7 @@ extension MainViewController: UICollectionViewDelegateFlowLayout, UICollectionVi
                 cell.backgroundColor = .lightGray
             }
         }
-        else {
+        if  collectionView == self.genresCollection {
             if let cell = collectionView.cellForItem(at: indexPath) as? GenresCollectionViewCell {
                 cell.backgroundColor = .blue
             }
