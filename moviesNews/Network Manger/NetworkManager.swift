@@ -13,6 +13,7 @@ class NetworkManager {
     private let urlString: String = "https://api.themoviedb.org"
     private let apiKey: String = "d568b1ed6289cb2eb4c00ca0e87771ee"
     private let session = URLSession(configuration: .default)
+    
     private lazy var urlComponents: URLComponents = {
         var components = URLComponents()
         components.scheme = "https"
@@ -46,6 +47,7 @@ class NetworkManager {
             }
         }
     }
+    
     func loadCastOfMovie(movieId:Int, completion: @escaping([CastElement]) -> Void){
         var components = urlComponents
         components.path = "/3/movie/\(movieId)/casts"
@@ -117,6 +119,7 @@ class NetworkManager {
             }
         }
     }
+    
     func loadMovieDetailsVideos(id: Int, completion: @escaping([Video]) -> Void){
         var components = urlComponents
         components.path = "/3/movie/\(id)/videos"
@@ -140,6 +143,7 @@ class NetworkManager {
             }
         }
     }
+    
     func loadMovieDetailsExternalIds(id: Int, completion: @escaping(ExterndalIds) -> Void){
         var components = urlComponents
         components.path = "/3/movie/\(id)/external_ids"
@@ -163,6 +167,7 @@ class NetworkManager {
             }
         }
     }
+    
     func loadCastDetails(id: Int, completion: @escaping(Actor) -> Void){
         var components = urlComponents
         components.path = "/3/person/\(id)"
@@ -186,6 +191,7 @@ class NetworkManager {
             }
         }
     }
+    
     func loadPhotosOfActor(id: Int, completion: @escaping([Profile]) -> Void){
         var components = urlComponents
         components.path = "/3/person/\(id)/images"
@@ -199,7 +205,6 @@ class NetworkManager {
             }
             do{
                 let photos = try JSONDecoder().decode(Photos.self, from: data)
-                print(photos)
                 DispatchQueue.main.async {
                     completion(photos.profiles)
                 }
@@ -210,6 +215,7 @@ class NetworkManager {
             }
         }
     }
+    
     func loadMoviesOfActor(id: Int, completion: @escaping([Movies]) -> Void){
         var components = urlComponents
         components.path = "/3/person/\(id)/movie_credits"
@@ -223,7 +229,6 @@ class NetworkManager {
             }
             do{
                 let movies = try JSONDecoder().decode(MoviesOfActor.self, from: data)
-                print(movies)
                 DispatchQueue.main.async {
                     completion(movies.cast)
                 }
@@ -234,6 +239,7 @@ class NetworkManager {
             }
         }
     }
+    
     func loadActorsExternalIds(id: Int, completion: @escaping(ActorsExternalIds) -> Void){
         var components = urlComponents
         components.path = "/3/person/\(id)/external_ids"
@@ -257,4 +263,5 @@ class NetworkManager {
             }
         }
     }
+    
 }

@@ -8,14 +8,16 @@
 import UIKit
 import Kingfisher
 class MovieTableViewCell: UITableViewCell {
-
+    
+    // MARK: UI Components
     var imageMovie: UIImageView = {
         let view = UIImageView()
         view.layer.masksToBounds = true
-        view.layer.cornerRadius = 20
+        view.layer.cornerRadius = 20 
         view.contentMode = .scaleAspectFill
         return view
     }()
+    
     var labelMovie: UILabel = {
         let view = UILabel()
         view.font = UIFont.systemFont(ofSize: 28, weight: .bold)
@@ -24,6 +26,7 @@ class MovieTableViewCell: UITableViewCell {
         view.textAlignment = .center
         return view
     }()
+    
     var dateLabel: UILabel = {
         let view = UILabel()
         view.font = UIFont.systemFont(ofSize: 20, weight: .regular)
@@ -31,6 +34,7 @@ class MovieTableViewCell: UITableViewCell {
         view.textAlignment = .center
         return view
     }()
+    
     var ratingLabel: UILabel = {
         let view = UILabel()
         view.layer.masksToBounds = true
@@ -41,32 +45,31 @@ class MovieTableViewCell: UITableViewCell {
         return view
     }()
     
-   
+    // MARK: Inits
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupViews()
     }
+    
     required init?(coder aDecoder: NSCoder) {
             fatalError("init(coder:) has not been implemented")
     }
     
+    // MARK: Methods
     func configure(title: String, image: String, date: String, rating: Double){
         labelMovie.text = title
         dateLabel.text = date
         ratingLabel.text = "★ \(rating)"
         let urlString = "https://image.tmdb.org/t/p/w200" + (image)
-       
         let url = URL(string: urlString)!
         imageMovie.kf.setImage(with: url)
-
     }
+    
     private func setupViews() {
         self.backgroundColor = .clear
-        
         [imageMovie, labelMovie, dateLabel, ratingLabel].forEach {
             contentView.addSubview($0)
         }
-        
         imageMovie.snp.makeConstraints { make in
             make.height.equalTo(400)
             make.width.equalTo(300)

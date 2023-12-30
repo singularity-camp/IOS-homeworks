@@ -9,26 +9,19 @@ import UIKit
 
 class GalleryViewController: UIViewController {
     
+    // MARK: Properties
     var actorId = Int()
     var allPhotosCount = Int()
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        setupViews()
-        loadData()
-    }
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        let textAttributes = [NSAttributedString.Key.foregroundColor:UIColor.white]
-        self.navigationController?.navigationBar.titleTextAttributes = textAttributes
-        let xBarButton = UIBarButtonItem(image: UIImage(systemName: "xmark"), style: .plain, target: self, action: #selector(xButtonClick))
-        self.navigationItem.rightBarButtonItem = xBarButton
-        self.navigationController?.navigationBar.tintColor = .white;
-        self.navigationItem.hidesBackButton = true
-    }
-    @objc func xButtonClick(){
-        self.navigationController?.popViewController(animated: true)
-    }
+    
     private var networkManager = NetworkManager.shared
+    
+    private lazy var photos:[Profile] = [] {
+        didSet{
+            self.galleryCollection.reloadData()
+        }
+    }
+    
+    // MARK: UI Components
     private lazy var galleryCollection: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
@@ -44,27 +37,48 @@ class GalleryViewController: UIViewController {
         view.dataSource = self
         return view
     }()
-    private lazy var photos:[Profile] = [] {
-        didSet{
-            self.galleryCollection.reloadData()
-        }
+    
+    // MARK: Lifecycle
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        setupViews()
+        loadData()
     }
-    func setupViews(){
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        let textAttributes = [NSAttributedString.Key.foregroundColor:UIColor.white]
+        self.navigationController?.navigationBar.titleTextAttributes = textAttributes
+        let xBarButton = UIBarButtonItem(image: UIImage(systemName: "xmark"), style: .plain, target: self, action: #selector(xButtonClick))
+        self.navigationItem.rightBarButtonItem = xBarButton
+        self.navigationController?.navigationBar.tintColor = .white;
+        self.navigationItem.hidesBackButton = true
+    }
+    
+    // MARK: Methods
+    private func setupViews(){
         self.title = "1/\(allPhotosCount)"
+        view.backgroundColor = .black
         view.addSubview(galleryCollection)
-        
         galleryCollection.snp.makeConstraints { make in
-            make.top.left.right.bottom.equalTo(view.safeAreaLayoutGuide)
+            make.edges.equalTo(view.safeAreaLayoutGuide)
         }
     }
-    func loadData(){
+    
+    private func loadData(){
         networkManager.loadPhotosOfActor(id: actorId) { [weak self] photos in
             photos.forEach { photo in
                 self?.photos.append(photo)
             }
         }
     }
+    
+    @objc private func xButtonClick(){
+        self.navigationController?.popViewController(animated: true)
+    }
 }
+
+// MARK: CollectionViewDelegate, DataSource
 extension GalleryViewController: UICollectionViewDelegateFlowLayout, UICollectionViewDataSource, UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return photos.count
@@ -79,7 +93,15 @@ extension GalleryViewController: UICollectionViewDelegateFlowLayout, UICollectio
         let height = collectionView.frame.height
         return CGSize(width: width, height: height)
     }
-    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        self.title = "\(indexPath.row + 1)/\(allPhotosCount)"
+}
+// MARK: UIScrollViewDelegate
+extension GalleryViewController: UIScrollViewDelegate {
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        if let collectionView = scrollView as? UICollectionView {
+            let visibleIndexPaths = collectionView.indexPathsForVisibleItems
+            if let lastIndexPath = visibleIndexPaths.last {
+                self.title = "\(lastIndexPath.row + 1)/\(allPhotosCount)"
+            }
+        }
     }
 }

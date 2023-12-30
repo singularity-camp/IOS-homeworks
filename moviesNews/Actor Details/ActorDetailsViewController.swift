@@ -8,13 +8,28 @@
 import UIKit
 
 class ActorDetailsViewController: UIViewController {
+    // MARK: Properties
+    var actorId = Int()
     
     private var networkManager = NetworkManager.shared
-    var actorId = Int()
     private var allPhotosCount = Int()
     private var lastPhotoIndex = Int()
+    
+    private lazy var photos:[Profile] = [] {
+        didSet{
+            self.photosOfActorCollection.reloadData()
+        }
+    }
+    
+    private lazy var movies:[Movies] = [] {
+        didSet{
+            self.moviesCollection.reloadData()
+        }
+    }
+    
+    // MARK: UI Components
     private var imageView = UIImageView()
-    private var biographyView = CustomOverviewUiView()
+    private var biographyView = CustomOverview()
     private var scrollView: UIScrollView = {
         let scroll = UIScrollView()
         scroll.showsVerticalScrollIndicator = false
@@ -22,7 +37,9 @@ class ActorDetailsViewController: UIViewController {
         scroll.contentInset = .zero
         return scroll
     }()
+    
     private var contentView = UIView()
+    
     private var nameLabel: UILabel = {
         let view = UILabel()
         view.font = UIFont.systemFont(ofSize: 48, weight: .bold)
@@ -31,6 +48,7 @@ class ActorDetailsViewController: UIViewController {
         view.numberOfLines = 0
         return view
     }()
+    
     private var bornLabel: UILabel = {
         let view = UILabel()
         view.font = UIFont.systemFont(ofSize: 15, weight: .medium)
@@ -39,6 +57,7 @@ class ActorDetailsViewController: UIViewController {
         view.numberOfLines = 0
         return view
     }()
+    
     private var placeOfBornLabel: UILabel = {
         let view = UILabel()
         view.font = UIFont.systemFont(ofSize: 15, weight: .medium)
@@ -47,6 +66,7 @@ class ActorDetailsViewController: UIViewController {
         view.numberOfLines = 0
         return view
     }()
+    
     private var deathLabel: UILabel = {
         let view = UILabel()
         view.font = UIFont.systemFont(ofSize: 15, weight: .medium)
@@ -55,6 +75,7 @@ class ActorDetailsViewController: UIViewController {
         view.numberOfLines = 0
         return view
     }()
+    
     private lazy var photosOfActorCollection: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
@@ -67,11 +88,7 @@ class ActorDetailsViewController: UIViewController {
         view.dataSource = self
         return view
     }()
-    private lazy var photos:[Profile] = [] {
-        didSet{
-            self.photosOfActorCollection.reloadData()
-        }
-    }
+    
     private lazy var moviesCollection: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
@@ -84,11 +101,7 @@ class ActorDetailsViewController: UIViewController {
         view.dataSource = self
         return view
     }()
-    private lazy var movies:[Movies] = [] {
-        didSet{
-            self.moviesCollection.reloadData()
-        }
-    }
+    
     private var photosLabel: UILabel = {
         let view = UILabel()
         view.font = UIFont.systemFont(ofSize: 36, weight: .bold)
@@ -98,6 +111,7 @@ class ActorDetailsViewController: UIViewController {
         view.numberOfLines = 0
         return view
     }()
+    
     private var moviesLabel: UILabel = {
         let view = UILabel()
         view.font = UIFont.systemFont(ofSize: 36, weight: .bold)
@@ -107,6 +121,7 @@ class ActorDetailsViewController: UIViewController {
         view.numberOfLines = 0
         return view
     }()
+    
     private var linkLabel: UILabel = {
         let view = UILabel()
         view.font = UIFont.systemFont(ofSize: 36, weight: .bold)
@@ -116,16 +131,19 @@ class ActorDetailsViewController: UIViewController {
         view.numberOfLines = 0
         return view
     }()
+    
     private let imdbImage: UIImageView = {
         let image = UIImageView()
         image.image = UIImage(named: "imdb")
         return image
     }()
+    
     private let instagramImage: UIImageView = {
         let image = UIImageView()
         image.image = UIImage(named: "insta")
         return image
     }()
+    
     private let socialMediasStack: UIStackView = {
         let stack = UIStackView()
         stack.alignment = .center
@@ -135,18 +153,23 @@ class ActorDetailsViewController: UIViewController {
         stack.backgroundColor = .clear
         return stack
     }()
+    
+    // MARK: Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         setupViews()
         loadData()
     }
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         let textAttributes = [NSAttributedString.Key.foregroundColor:UIColor.black]
         self.navigationController?.navigationBar.titleTextAttributes = textAttributes
         self.navigationController?.navigationBar.tintColor = .black;
     }
-    func setupViews(){
+    
+    // MARK: Methods
+    private func setupViews(){
         view.addSubview(scrollView)
         scrollView.addSubview(contentView)
         view.backgroundColor = .white
@@ -219,7 +242,7 @@ class ActorDetailsViewController: UIViewController {
         }
         socialMediasStack.snp.makeConstraints { make in
             make.top.equalTo(linkLabel.snp.bottom).offset(4)
-            make.left.right.equalToSuperview().inset(28)
+            make.left.right.equalToSuperview().inset(80)
             make.height.equalTo(50)
             make.bottom.equalToSuperview()
         }
@@ -231,30 +254,7 @@ class ActorDetailsViewController: UIViewController {
         instagramImage.isUserInteractionEnabled = true
     }
     
-    @objc func imdbTapped(){
-        networkManager.loadActorsExternalIds(id: actorId) { ids in
-            guard let id = ids.imdbID else {
-                return
-            }
-            let urlString = "https://www.imdb.com/name/" + id
-            if let url = URL(string: urlString){
-                UIApplication.shared.open(url)
-            }
-        }
-    }
-    @objc func instagramTapped(){
-        networkManager.loadActorsExternalIds(id: actorId) { ids in
-            guard let id = ids.instagramID else {
-                return
-            }
-            let urlString = "https://www.instagram.com/" + id
-            if let url = URL(string: urlString){
-                UIApplication.shared.open(url)
-            }
-        }
-    }
-    
-    func loadData(){
+    private func loadData(){
         networkManager.loadCastDetails(id: actorId) { [weak self] actorDetails in
             guard let posterPath = actorDetails.profilePath else{return}
             let urlString = "https://image.tmdb.org/t/p/w200" + (posterPath)
@@ -288,8 +288,33 @@ class ActorDetailsViewController: UIViewController {
             }
         }
     }
+    
+    @objc func imdbTapped(){
+        networkManager.loadActorsExternalIds(id: actorId) { ids in
+            guard let id = ids.imdbID else {
+                return
+            }
+            let urlString = "https://www.imdb.com/name/" + id
+            if let url = URL(string: urlString){
+                UIApplication.shared.open(url)
+            }
+        }
+    }
+    
+    @objc func instagramTapped(){
+        networkManager.loadActorsExternalIds(id: actorId) { ids in
+            guard let id = ids.instagramID else {
+                return
+            }
+            let urlString = "https://www.instagram.com/" + id
+            if let url = URL(string: urlString){
+                UIApplication.shared.open(url)
+            }
+        }
+    }
 }
 
+// MARK: CollectionViewDelegate, DataSource
 extension ActorDetailsViewController: UICollectionViewDelegateFlowLayout, UICollectionViewDataSource, UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if collectionView == photosOfActorCollection{
@@ -312,12 +337,7 @@ extension ActorDetailsViewController: UICollectionViewDelegateFlowLayout, UIColl
                 }
             }
             else {
-                if indexPath.row != allPhotosCount - 1 {
-                    cell.configure(plus: "", imagePath: photos[indexPath.row].filePath, alpha: 1.0)
-                }
-                else {
-                    cell.configure(plus: "+1", imagePath: photos[indexPath.row].filePath, alpha: 0.5)
-                }
+                cell.configure(plus: "", imagePath: photos[indexPath.row].filePath, alpha: 1.0)
             }
             return cell
         }
@@ -327,6 +347,7 @@ extension ActorDetailsViewController: UICollectionViewDelegateFlowLayout, UIColl
             return cell
         }
     }
+    
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         if collectionView == photosOfActorCollection{
             return CGSize(width: 80, height: 150)
@@ -335,14 +356,13 @@ extension ActorDetailsViewController: UICollectionViewDelegateFlowLayout, UIColl
             return CGSize(width: 200, height: 80)
         }
     }
+    
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if collectionView == photosOfActorCollection {
-            if indexPath.row == lastPhotoIndex {
-                let gallery = GalleryViewController()
-                gallery.actorId = actorId
-                gallery.allPhotosCount = allPhotosCount
-                navigationController?.pushViewController(gallery, animated: true)
-            }
+            let gallery = GalleryViewController()
+            gallery.actorId = actorId
+            gallery.allPhotosCount = allPhotosCount
+            navigationController?.pushViewController(gallery, animated: true)
         }
     }
 }

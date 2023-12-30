@@ -8,6 +8,8 @@
 import UIKit
 
 class ActorPhotosCollectionViewCell: UICollectionViewCell {
+    
+    // MARK: UI Components
     private var profileImage: UIImageView = {
         let view = UIImageView()
         view.layer.masksToBounds = true
@@ -15,6 +17,7 @@ class ActorPhotosCollectionViewCell: UICollectionViewCell {
         view.contentMode = .scaleAspectFill
         return view
     }()
+    
     private var plusLabel: UILabel = {
         let view = UILabel()
         view.font = UIFont.systemFont(ofSize: 14, weight: .bold)
@@ -23,13 +26,31 @@ class ActorPhotosCollectionViewCell: UICollectionViewCell {
         view.numberOfLines = 0
         return view
     }()
+    
+    // MARK: Inits
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupViews()
     }
+    
     required init?(coder aDecoder: NSCoder) {
             fatalError("init(coder:) has not been implemented")
     }
+    
+    // MARK: Methods
+    func configure(plus: String, imagePath: String, alpha: Double){
+        plusLabel.text = plus
+        if imagePath != "noImage"{
+            let urlString = "https://image.tmdb.org/t/p/w200" + (imagePath)
+            let url = URL(string: urlString)!
+            profileImage.kf.setImage(with: url)
+        }
+        else {
+            profileImage.image = UIImage(named: "noProfile")
+        }
+        profileImage.alpha = alpha
+    }
+    
     private func setupViews(){
         [profileImage, plusLabel].forEach {
             contentView.addSubview($0)
@@ -44,16 +65,6 @@ class ActorPhotosCollectionViewCell: UICollectionViewCell {
             make.center.equalToSuperview()
         }
     }
-    func configure(plus: String, imagePath: String, alpha: Double){
-        plusLabel.text = plus
-        if imagePath != "noImage"{
-            let urlString = "https://image.tmdb.org/t/p/w200" + (imagePath)
-            let url = URL(string: urlString)!
-            profileImage.kf.setImage(with: url)
-        }
-        else {
-            profileImage.image = UIImage(named: "noProfile")
-        }
-        profileImage.alpha = alpha
-    }
+    
+  
 }

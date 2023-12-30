@@ -1,5 +1,5 @@
 //
-//  CustomOverviewUiView.swift
+//  CustomOverview.swift
 //  moviesNews
 //
 //  Created by Диас Мухамедрахимов on 24.12.2023.
@@ -7,9 +7,9 @@
 
 import UIKit
 
-@IBDesignable
-class CustomOverviewUiView: UIView {
+class CustomOverview: UIView {
     
+    // MARK: UI Components
     private var titleLabel: UILabel = {
         let view = UILabel()
         view.font = UIFont.systemFont(ofSize: 36, weight: .bold)
@@ -18,6 +18,7 @@ class CustomOverviewUiView: UIView {
         view.numberOfLines = 1
         return view
     }()
+    
     private var textLabel: UILabel = {
         let view = UILabel()
         view.font = UIFont.systemFont(ofSize: 10, weight: .regular)
@@ -27,12 +28,20 @@ class CustomOverviewUiView: UIView {
         return view
     }()
     
+    // MARK: Inits
     override init(frame: CGRect) {
         super.init(frame: frame)
         configureView()
     }
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    // MARK: Methods
+    func configureView(with title: String, and text: String){
+        self.titleLabel.text = title
+        self.textLabel.text = text
     }
     
     private func configureView(){
@@ -51,8 +60,5 @@ class CustomOverviewUiView: UIView {
             make.bottom.equalToSuperview().inset(16)
         }
     }
-    func configureView(with title: String, and text: String){
-        self.titleLabel.text = title
-        self.textLabel.text = text
-    }
+    
 }

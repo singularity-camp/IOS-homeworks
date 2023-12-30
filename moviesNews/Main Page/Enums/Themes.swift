@@ -25,6 +25,7 @@ enum Themes: String, CaseIterable {
             return "top_rated"
         }
     }
+    
     var key: String {
         return rawValue
     }

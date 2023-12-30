@@ -8,6 +8,8 @@
 import UIKit
 
 class CastCollectionViewCell: UICollectionViewCell {
+    
+    // MARK: UI Components
     private var profileImage: UIImageView = {
         let view = UIImageView()
         view.layer.masksToBounds = true
@@ -15,6 +17,7 @@ class CastCollectionViewCell: UICollectionViewCell {
         view.contentMode = .scaleAspectFill
         return view
     }()
+    
     private var nameLabel: UILabel = {
         let view = UILabel()
         view.font = UIFont.systemFont(ofSize: 10, weight: .medium)
@@ -23,6 +26,7 @@ class CastCollectionViewCell: UICollectionViewCell {
         view.numberOfLines = 0
         return view
     }()
+    
     private var roleLabel: UILabel = {
         let view = UILabel()
         view.font = UIFont.systemFont(ofSize: 10, weight: .medium)
@@ -32,12 +36,28 @@ class CastCollectionViewCell: UICollectionViewCell {
         return view
     }()
     
+    // MARK: Inits
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupViews()
     }
+    
     required init?(coder aDecoder: NSCoder) {
             fatalError("init(coder:) has not been implemented")
+    }
+    
+    // MARK: Methods
+    func configure(name: String, role: String, imagePath: String){
+        nameLabel.text = name
+        roleLabel.text = role
+        if imagePath != "noImage"{
+            let urlString = "https://image.tmdb.org/t/p/w200" + (imagePath)
+            let url = URL(string: urlString)!
+            profileImage.kf.setImage(with: url)
+        }
+        else {
+            profileImage.image = UIImage(named: "noProfile")
+        }
     }
     
     private func setupViews(){
@@ -60,18 +80,6 @@ class CastCollectionViewCell: UICollectionViewCell {
         }
     }
     
-    func configure(name: String, role: String, imagePath: String){
-        nameLabel.text = name
-        roleLabel.text = role
-        if imagePath != "noImage"{
-            let urlString = "https://image.tmdb.org/t/p/w200" + (imagePath)
-            let url = URL(string: urlString)!
-            profileImage.kf.setImage(with: url)
-        }
-        else {
-            profileImage.image = UIImage(named: "noProfile")
-        }
-    }
 }
     
     
