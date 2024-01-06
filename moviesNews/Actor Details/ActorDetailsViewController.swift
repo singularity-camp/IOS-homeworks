@@ -140,7 +140,7 @@ class ActorDetailsViewController: UIViewController {
     
     private let instagramImage: UIImageView = {
         let image = UIImageView()
-        image.image = UIImage(named: "insta")
+        image.image = UIImage(named: "instagram")
         return image
     }()
     
@@ -165,7 +165,7 @@ class ActorDetailsViewController: UIViewController {
         super.viewWillAppear(animated)
         let textAttributes = [NSAttributedString.Key.foregroundColor:UIColor.black]
         self.navigationController?.navigationBar.titleTextAttributes = textAttributes
-        self.navigationController?.navigationBar.tintColor = .black;
+        self.navigationController?.navigationBar.tintColor = .black
     }
     
     // MARK: Methods
@@ -362,6 +362,7 @@ extension ActorDetailsViewController: UICollectionViewDelegateFlowLayout, UIColl
             let gallery = GalleryViewController()
             gallery.actorId = actorId
             gallery.allPhotosCount = allPhotosCount
+            gallery.indexOfShownPhoto = indexPath
             navigationController?.pushViewController(gallery, animated: true)
         }
     }

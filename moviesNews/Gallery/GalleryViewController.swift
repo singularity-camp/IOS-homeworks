@@ -12,6 +12,7 @@ class GalleryViewController: UIViewController {
     // MARK: Properties
     var actorId = Int()
     var allPhotosCount = Int()
+    var indexOfShownPhoto = IndexPath()
     
     private var networkManager = NetworkManager.shared
     
@@ -51,13 +52,17 @@ class GalleryViewController: UIViewController {
         self.navigationController?.navigationBar.titleTextAttributes = textAttributes
         let xBarButton = UIBarButtonItem(image: UIImage(systemName: "xmark"), style: .plain, target: self, action: #selector(xButtonClick))
         self.navigationItem.rightBarButtonItem = xBarButton
-        self.navigationController?.navigationBar.tintColor = .white;
+        self.navigationController?.navigationBar.tintColor = .white
         self.navigationItem.hidesBackButton = true
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        self.galleryCollection.scrollToItem(at: indexOfShownPhoto, at: .top, animated: true)
     }
     
     // MARK: Methods
     private func setupViews(){
-        self.title = "1/\(allPhotosCount)"
+        self.title = "\(indexOfShownPhoto.row + 1)/\(allPhotosCount)"
         view.backgroundColor = .black
         view.addSubview(galleryCollection)
         galleryCollection.snp.makeConstraints { make in

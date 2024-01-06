@@ -40,7 +40,7 @@ class MainViewController: UIViewController {
         view.font = UIFont.systemFont(ofSize: 36, weight: .bold)
         view.textAlignment = .center
         view.textColor = .black
-        view.text = "MovieNews"
+        view.text = "MoviesNews"
         return view
     }()
     
@@ -154,21 +154,21 @@ class MainViewController: UIViewController {
             UIView.addKeyframe(withRelativeStartTime: 0.5, relativeDuration: 0.45, animations: {
                 self.invokeAnimatedTitleLabel()
             })
-            UIView.addKeyframe(withRelativeStartTime: 0.6, relativeDuration: 0.5, animations: {
+            UIView.addKeyframe(withRelativeStartTime: 0.9, relativeDuration: 0.5, animations: {
                 self.containerView.alpha = 1
             })
         })
     }
     
     private func invokeAnimatedTitleLabel(){
-        titleLabelYPosition.update(offset: -(view.safeAreaLayoutGuide.layoutFrame.height / 2 - 20))
+        titleLabelYPosition.update(offset: -(view.safeAreaLayoutGuide.layoutFrame.height / 2 - 40))
         view.layoutSubviews()
     }
     
     private func setupViews() {
         view.backgroundColor = .white
         self.navigationItem.backBarButtonItem = UIBarButtonItem(title:"", style:.plain, target:nil, action:nil)
-        self.navigationController?.navigationBar.tintColor = .black;
+        self.navigationController?.navigationBar.tintColor = .black
         showGenresButton.addTarget(self, action: #selector(showGenreTapped(_ :)), for: .touchUpInside)
         arrowGenresButton.addTarget(self, action: #selector(showGenreTapped(_ :)), for: .touchUpInside)
         containerView.alpha = 0
@@ -296,6 +296,7 @@ extension MainViewController: UICollectionViewDelegateFlowLayout, UICollectionVi
             let cell = genresCollection.dequeueReusableCell(withReuseIdentifier: "genreCell", for: indexPath) as! CustomCollectionViewCell
             cell.configure(title: genres[indexPath.row].name, selectedBackgroundColor: .systemRed, unselectedBackgroundColor: .blue)
             cell.configureCustonTitle(with: UIFont.systemFont(ofSize: 14))
+            cell.isSelected = true
             return cell
         }
     }

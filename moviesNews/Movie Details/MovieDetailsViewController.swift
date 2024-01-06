@@ -210,7 +210,7 @@ class MovieDetailsViewController: UIViewController {
         let textAttributes = [NSAttributedString.Key.foregroundColor:UIColor.black]
         self.navigationController?.navigationBar.titleTextAttributes = textAttributes
         self.navigationItem.backBarButtonItem = UIBarButtonItem(title:"", style:.plain, target:nil, action:nil)
-        self.navigationController?.navigationBar.tintColor = .black;
+        self.navigationController?.navigationBar.tintColor = .black
     }
     
     // MARK: Methods
