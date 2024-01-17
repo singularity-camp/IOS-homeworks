@@ -45,6 +45,19 @@ class MovieTableViewCell: UITableViewCell {
         return view
     }()
     
+    var imageFavorite: UIImageView = {
+        let view = UIImageView()
+        view.image = UIImage(named: "icon_favorites")?.withRenderingMode(.alwaysTemplate)
+        view.contentMode = .scaleAspectFit
+        view.layer.masksToBounds = true
+        view.layer.cornerRadius = 18
+        view.backgroundColor = .systemGray
+        view.tintColor = .systemRed
+        return view
+    }()
+    
+    var didTapFavorite: (() -> Void)?
+    
     // MARK: Inits
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -65,9 +78,13 @@ class MovieTableViewCell: UITableViewCell {
         imageMovie.kf.setImage(with: url)
     }
     
+    func deleteHeart(){
+        imageFavorite.isHidden = true
+    }
+    
     private func setupViews() {
         self.backgroundColor = .clear
-        [imageMovie, labelMovie, dateLabel, ratingLabel].forEach {
+        [imageMovie, labelMovie, dateLabel, ratingLabel, imageFavorite].forEach {
             contentView.addSubview($0)
         }
         imageMovie.snp.makeConstraints { make in
@@ -90,5 +107,32 @@ class MovieTableViewCell: UITableViewCell {
             make.height.equalTo(30)
             make.left.equalTo(imageMovie.snp.left).offset(8)
         })
+        imageFavorite.snp.makeConstraints { make in
+            make.top.equalTo(imageMovie.snp.top).offset(8)
+            make.size.equalTo(36)
+            make.right.equalTo(imageMovie.snp.right).inset(8)
+        }
+        
+        let tap = UITapGestureRecognizer(target: self, action: #selector(didTapFavorites))
+        imageFavorite.isUserInteractionEnabled = true
+        imageFavorite.addGestureRecognizer(tap)
+        
+    }
+    @objc
+    private func didTapFavorites() {
+        didTapFavorite?()
+        print("tapped")
+    }
+    
+    func toggleFavoriteHeart(with isFavorite: Bool) {
+        if isFavorite{
+            imageFavorite.backgroundColor = .systemRed
+            imageFavorite.tintColor = .systemGray
+        }
+        else {
+            imageFavorite.backgroundColor = .systemGray
+            imageFavorite.tintColor = .systemRed
+        }
+        
     }
 }

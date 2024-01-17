@@ -7,7 +7,7 @@
 
 import UIKit
 import Kingfisher
-class MovieDetailsViewController: UIViewController {
+class MovieDetailsViewController: BaseViewController {
     
     // MARK: Properties
     var movidId = Int()
@@ -305,6 +305,7 @@ class MovieDetailsViewController: UIViewController {
     }
     
     private func loadData(){
+        showLoader()
         networkManager.loadMovieDetails(id: movidId) { [weak self] movieDetails in
             guard let posterPath = movieDetails.posterPath else{return}
             self?.voteAvg = Int(round(movieDetails.voteAverage ?? 0))
@@ -319,10 +320,14 @@ class MovieDetailsViewController: UIViewController {
             let urlString = "https://image.tmdb.org/t/p/w200" + (posterPath)
             let url = URL(string: urlString)!
             self!.imageView.kf.setImage(with: url)
-        }
-        networkManager.loadCastOfMovie(movieId: movidId) { [weak self] cast in
-            cast.forEach { cast in
-                self?.cast.append(cast)
+            guard let movidId = self?.movidId else { return }
+            self?.networkManager.loadCastOfMovie(movieId: movidId) { [weak self] cast in
+                cast.forEach { cast in
+                    self?.cast.append(cast)
+                }
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+                self?.hideLoader()
             }
         }
     }

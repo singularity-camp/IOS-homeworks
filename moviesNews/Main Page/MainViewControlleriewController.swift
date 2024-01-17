@@ -7,6 +7,7 @@
 
 import UIKit
 import SnapKit
+import CoreData
 
 class MainViewController: UIViewController {
     
@@ -20,6 +21,7 @@ class MainViewController: UIViewController {
     private var selectedFillter = IndexPath(row: 0, section: 0)
     private var selectedGenre = IndexPath(row: 0, section: 0)
     private var currentArrow  = UIImage()
+    private var favoriteMovies: [NSManagedObject] = []
     
     private lazy var movie:[Result] = [] {
         didSet{
@@ -126,6 +128,7 @@ class MainViewController: UIViewController {
         setupViews()
         loadMovieList(filter: .nowPlaying, genreId: tappedGenreId)
         loadGenres()
+        loadFavorites()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -144,24 +147,33 @@ class MainViewController: UIViewController {
     }
     
     private func animate(){
-        UIView.animateKeyframes(withDuration: 2.5, delay: 0.5, animations: {
-            UIView.addKeyframe(withRelativeStartTime: 0.0, relativeDuration: 0.5, animations: {
-                self.titleLabel.alpha = 1
+        UIView.animateKeyframes(withDuration: 2.15, delay: 0.5, animations: {
+            UIView.addKeyframe(withRelativeStartTime: 0.0, relativeDuration: 0.2, animations: {
+                self.titleLabel.alpha = 1.0
             })
-            UIView.addKeyframe(withRelativeStartTime: 0.2, relativeDuration: 0.7, animations: {
+
+            UIView.addKeyframe(withRelativeStartTime: 0.2, relativeDuration: 0.28, animations: {
                 self.titleLabel.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
             })
-            UIView.addKeyframe(withRelativeStartTime: 0.5, relativeDuration: 0.45, animations: {
-                self.invokeAnimatedTitleLabel()
+
+            UIView.addKeyframe(withRelativeStartTime: 0.5, relativeDuration: 0.27, animations: {
+                self.titleLabelYPosition.update(offset: -(self.view.safeAreaLayoutGuide.layoutFrame.size.height / 2) + 10)
+                self.view.layoutSubviews()
             })
-            UIView.addKeyframe(withRelativeStartTime: 0.9, relativeDuration: 0.5, animations: {
-                self.containerView.alpha = 1
+
+            UIView.addKeyframe(withRelativeStartTime: 0.8, relativeDuration: 0.05, animations: {
+                self.titleLabelYPosition.update(offset: -(self.view.safeAreaLayoutGuide.layoutFrame.size.height / 2 - 16))
+                self.view.layoutSubviews()
+            })
+
+            UIView.addKeyframe(withRelativeStartTime: 1.0, relativeDuration: 0.15, animations: {
+                self.containerView.alpha = 1.0
             })
         })
     }
     
     private func invokeAnimatedTitleLabel(){
-        titleLabelYPosition.update(offset: -(view.safeAreaLayoutGuide.layoutFrame.height / 2 - 40))
+        titleLabelYPosition.update(offset: -(view.safeAreaLayoutGuide.layoutFrame.height / 2 - 20))
         view.layoutSubviews()
     }
     
@@ -250,6 +262,58 @@ class MainViewController: UIViewController {
             movie.genreIDS.contains(genreId)
         }
     }
+    
+    private func loadFavorites(){
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
+        let managedContext = appDelegate.persistentContainer.viewContext
+        let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "FavoriteMovies")
+        do {
+            favoriteMovies = try managedContext.fetch(fetchRequest)
+        } catch let error as NSError  {
+            print("Could not ferch data, error: \(error)")
+        }
+    }
+    
+    private func saveFavoriteMoview(with movie: Result){
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
+        let managedContext = appDelegate.persistentContainer.viewContext
+        guard let entity = NSEntityDescription.entity(forEntityName: "FavoriteMovies", in: managedContext) else { return }
+        let favoriteMovie = NSManagedObject(entity: entity, insertInto: managedContext)
+        favoriteMovie.setValue(movie.id, forKey: "id")
+        favoriteMovie.setValue(movie.title, forKey: "title")
+        favoriteMovie.setValue(movie.posterPath, forKey: "posterPath")
+        favoriteMovie.setValue(movie.releaseDate, forKey: "date")
+        favoriteMovie.setValue(movie.voteAverage, forKey: "rating")
+        do {
+            try managedContext.save()
+        } catch let error as NSError  {
+            print("Could not save, error: \(error)")
+        }
+    }
+    
+    private func deleteFavoriteMoview(with movie: Result){
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
+        let managedContext = appDelegate.persistentContainer.viewContext
+        let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "FavoriteMovies")
+        let predicate1 = NSPredicate(format: "id == %@", "\(movie.id)")
+        let predicate2 = NSPredicate(format: "title == %@", movie.title)
+        let predicate3 = NSPredicate(format: "posterPath == %@", movie.posterPath)
+        let predicate4 = NSPredicate(format: "date == %@", movie.releaseDate)
+        let predicate5 = NSPredicate(format: "rating == %@", "\(movie.voteAverage)")
+        let predicateAll = NSCompoundPredicate(type: .and, subpredicates: [predicate1, predicate2, predicate3, predicate4, predicate5])
+        fetchRequest.predicate = predicateAll
+        do {
+            let result = try managedContext.fetch(fetchRequest)
+            let data = result.first
+            if let data {
+                managedContext.delete(data)
+            }
+            try managedContext.save()
+        } catch let error as NSError  {
+            print("Could not delete, error: \(error)")
+        }
+
+    }
 }
 
 // MARK: TableViewDelegate, DataSource
@@ -262,6 +326,20 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
         let cell = movieTableView.dequeueReusableCell(withIdentifier: "movieCell", for: indexPath) as! MovieTableViewCell
         let movie = movie[indexPath.row]
         cell.configure(title: movie.title, image: movie.posterPath, date: movie.releaseDate, rating: movie.voteAverage)
+        let isFavoriteMovie = !self.favoriteMovies.filter({ ($0.value(forKeyPath: "id") as? Int) == movie.id }).isEmpty
+        cell.toggleFavoriteHeart(with: isFavoriteMovie)
+        cell.didTapFavorite = { [weak self] in
+            guard let self else { return }
+            let isFavoriteMovie = !self.favoriteMovies.filter({ ($0.value(forKeyPath: "id") as? Int) == movie.id }).isEmpty
+            cell.toggleFavoriteHeart(with: !isFavoriteMovie)
+            if isFavoriteMovie {
+                self.deleteFavoriteMoview(with: movie)
+            }
+            else {
+                self.saveFavoriteMoview(with: movie)
+            }
+            self.loadFavorites()
+        }
         cell.selectionStyle = .none
         return cell
     }
