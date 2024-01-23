@@ -16,8 +16,6 @@ struct Movie: Codable {
     }
 }
 
-
-
 // MARK: - Result
 struct Result: Codable {
     let genreIDS: [Int]

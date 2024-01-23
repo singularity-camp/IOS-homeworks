@@ -7,6 +7,7 @@
 
 import UIKit
 import Kingfisher
+
 class MovieTableViewCell: UITableViewCell {
     
     // MARK: UI Components

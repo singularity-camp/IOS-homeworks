@@ -9,6 +9,7 @@ import UIKit
 import Lottie
 
 class LoadingView: UIView {
+    
     private enum Constants {
         static let animationViewSize: CGSize = .init(width: 95, height: 200)
     }

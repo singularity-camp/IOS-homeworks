@@ -7,8 +7,9 @@
 
 import UIKit
 import Lottie
+
 class BaseViewController: UIViewController {
-    
+    // MARK: - Constants
     private enum Constants {
         static let animationViewSize: CGSize = .init(width: 40, height: 200)
     }
@@ -23,8 +24,6 @@ class BaseViewController: UIViewController {
         view.autoresizingMask = [.flexibleHeight, .flexibleHeight]
         return view
     }()
-    
-    
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
@@ -51,8 +50,4 @@ class BaseViewController: UIViewController {
             self?.loadingView.stopLoading()
         }
     }
-    
-   
-
-    
 }

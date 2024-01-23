@@ -7,7 +7,7 @@
 
 import UIKit
 
-class ActorDetailsViewController: UIViewController {
+class ActorDetailsViewController: BaseViewController {
     // MARK: Properties
     var actorId = Int()
     
@@ -255,6 +255,7 @@ class ActorDetailsViewController: UIViewController {
     }
     
     private func loadData(){
+        showLoader()
         networkManager.loadCastDetails(id: actorId) { [weak self] actorDetails in
             guard let posterPath = actorDetails.profilePath else{return}
             let urlString = "https://image.tmdb.org/t/p/w200" + (posterPath)
@@ -266,6 +267,9 @@ class ActorDetailsViewController: UIViewController {
             self?.placeOfBornLabel.text = actorDetails.placeOfBirth
             self?.deathLabel.text = "Death: \(actorDetails.deathday ?? "Alive")"
             self?.biographyView.configureView(with: "Biography", and: actorDetails.biography ?? "No bio yet")
+            DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+                self?.hideLoader()
+            }
         }
         networkManager.loadPhotosOfActor(id: actorId) {[weak self] photos in
             if photos.count > 4 {
