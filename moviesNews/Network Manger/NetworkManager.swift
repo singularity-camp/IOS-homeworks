@@ -24,6 +24,11 @@ class NetworkManager {
         return components
     }()
     
+    private let headers: HTTPHeaders = [
+        "accept": "application/json",
+        "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI4YzIyYzEwNjdjZWM3OWRlMDgyODg5Mjg5NGUzMWJkYyIsInN1YiI6IjY1YjIzYzE3MGYyZmJkMDEzMDY2YTBiNiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.Mp_XUBq4oK4yBkE0QWgpQE-uhK_5ayYAdfjJPRkVyv0"
+    ]
+    
     func loadMovieLists(filter: String, completion: @escaping([Result]) -> Void){
         var components = urlComponents
         components.path = "/3/movie/\(filter)"
@@ -264,4 +269,105 @@ class NetworkManager {
         }
     }
     
+    func getRequestToken(completion: @escaping (APIResult<RequestTokenModel>) -> Void) {
+        var components = urlComponents
+        components.path = "/3/authentication/token/new"
+        components.queryItems = nil
+        
+        guard let requestUrl = components.url else {
+            completion(.failure(.unknown))
+            return
+        }
+        
+        AF.request(requestUrl, headers: headers).responseData { response in
+            switch response.result {
+            case .success(let data):
+                print(response)
+                do {
+                    let requestTokenModel = try JSONDecoder().decode(RequestTokenModel.self, from: data)
+                    completion(.success(requestTokenModel))
+                } catch {
+                    completion(.failure(.incorrectJson))
+                }
+            case .failure:
+                completion(.failure(.unknown))
+            }
+        }
+    }
+    
+    func validateWithLogin(requestBody: [String: Any], completion: @escaping (APIResult<RequestTokenModel>) -> Void) {
+        var components = urlComponents
+        components.path = "/3/authentication/token/validate_with_login"
+        var requestHeaders = headers
+        requestHeaders["Content-Type"] = "application/json"
+        
+        guard let requestUrl = components.url else {
+            completion(.failure(.unknown))
+            return
+        }
+        
+        AF.request(
+            requestUrl,
+            method: .post,
+            parameters: requestBody,
+            encoding: JSONEncoding.default,
+            headers: requestHeaders
+        ).responseData { response in
+            switch response.result {
+            case .success(let data):
+                do {
+                    let requestTokenModel = try JSONDecoder().decode(RequestTokenModel.self, from: data)
+                    completion(.success(requestTokenModel))
+                } catch {
+                    completion(.failure(.incorrectJson))
+                }
+            case .failure:
+                completion(.failure(.unknown))
+            }
+        }
+    }
+    
+    func createSession(requestBody: [String: Any], completion: @escaping (APIResult<String>) -> Void) {
+        var components = urlComponents
+        components.path = "/3/authentication/session/new"
+        
+        var requestHeaders = headers
+        requestHeaders["Content-Type"] = "application/json"
+        
+        guard let requestUrl = components.url else {
+            completion(.failure(.unknown))
+            return
+        }
+        
+        AF.request(
+            requestUrl,
+            method: .post,
+            parameters: requestBody,
+            encoding: JSONEncoding.default,
+            headers: requestHeaders
+        ).responseData { response in
+            switch response.result {
+            case .success(let data):
+                do {
+                    if
+                        let responseData = try JSONSerialization.jsonObject(
+                            with: data,
+                            options: []
+                        ) as? [String: Any],
+                        let success = responseData["success"] as? Bool,
+                        success,
+                        let sessionId = responseData["session_id"] as? String
+                    {
+                        completion(.success(sessionId))
+                    } else {
+                        completion(.failure(.failedWith(reason: "Failed to create session")))
+                    }
+                } catch {
+                    completion(.failure(.incorrectJson))
+                }
+            case .failure:
+                completion(.failure(.unknown))
+            }
+        }
+    }
 }

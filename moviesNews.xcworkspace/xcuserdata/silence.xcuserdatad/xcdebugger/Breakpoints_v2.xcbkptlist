@@ -77,8 +77,8 @@
             filePath = "moviesNews/Network Manger/NetworkManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "206"
-            endingLineNumber = "206"
+            startingLineNumber = "211"
+            endingLineNumber = "211"
             landmarkName = "loadPhotosOfActor(id:completion:)"
             landmarkType = "7">
             <Locations>
@@ -155,8 +155,8 @@
             filePath = "moviesNews/Network Manger/NetworkManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "208"
-            endingLineNumber = "208"
+            startingLineNumber = "213"
+            endingLineNumber = "213"
             landmarkName = "loadPhotosOfActor(id:completion:)"
             landmarkType = "7">
             <Locations>
@@ -278,8 +278,8 @@
             filePath = "moviesNews/Network Manger/NetworkManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "207"
-            endingLineNumber = "207"
+            startingLineNumber = "212"
+            endingLineNumber = "212"
             landmarkName = "loadPhotosOfActor(id:completion:)"
             landmarkType = "7">
             <Locations>
@@ -356,8 +356,8 @@
             filePath = "moviesNews/Network Manger/NetworkManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "209"
-            endingLineNumber = "209"
+            startingLineNumber = "214"
+            endingLineNumber = "214"
             landmarkName = "loadPhotosOfActor(id:completion:)"
             landmarkType = "7">
             <Locations>
@@ -434,8 +434,8 @@
             filePath = "moviesNews/Network Manger/NetworkManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "211"
-            endingLineNumber = "211"
+            startingLineNumber = "216"
+            endingLineNumber = "216"
             landmarkName = "loadPhotosOfActor(id:completion:)"
             landmarkType = "7">
             <Locations>
@@ -527,8 +527,8 @@
             filePath = "moviesNews/Network Manger/NetworkManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "212"
-            endingLineNumber = "212"
+            startingLineNumber = "217"
+            endingLineNumber = "217"
             landmarkName = "loadPhotosOfActor(id:completion:)"
             landmarkType = "7">
             <Locations>
@@ -650,8 +650,8 @@
             filePath = "moviesNews/Network Manger/NetworkManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "213"
-            endingLineNumber = "213"
+            startingLineNumber = "218"
+            endingLineNumber = "218"
             landmarkName = "loadPhotosOfActor(id:completion:)"
             landmarkType = "7">
             <Locations>
