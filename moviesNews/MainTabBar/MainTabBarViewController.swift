@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SwiftKeychainWrapper
 
 class MainTabBarViewController: UITabBarController {
     
@@ -38,7 +39,9 @@ class MainTabBarViewController: UITabBarController {
         view.backgroundColor = .white
         tabBar.tintColor = .black
         tabBar.backgroundColor = .white
-        
+        tabBar.layer.masksToBounds = true
+        tabBar.layer.borderColor = UIColor.black.cgColor
+        tabBar.layer.borderWidth = 1.50
         setViewControllers(allViewControllers, animated: false)
         
         guard let items = self.tabBar.items else { return }

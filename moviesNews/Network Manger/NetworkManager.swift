@@ -7,12 +7,14 @@
 
 import Foundation
 import Alamofire
+import SwiftKeychainWrapper
 
 class NetworkManager {
     static var shared = NetworkManager()
     private let urlString: String = "https://api.themoviedb.org"
-    private let apiKey: String = "d568b1ed6289cb2eb4c00ca0e87771ee"
+    private var apiKey: String? = KeychainWrapper.standard.string(forKey: "SessionId")
     private let session = URLSession(configuration: .default)
+    private var isLoggedIn = false
     
     private lazy var urlComponents: URLComponents = {
         var components = URLComponents()
@@ -26,7 +28,7 @@ class NetworkManager {
     
     private let headers: HTTPHeaders = [
         "accept": "application/json",
-        "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI4YzIyYzEwNjdjZWM3OWRlMDgyODg5Mjg5NGUzMWJkYyIsInN1YiI6IjY1YjIzYzE3MGYyZmJkMDEzMDY2YTBiNiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.Mp_XUBq4oK4yBkE0QWgpQE-uhK_5ayYAdfjJPRkVyv0"
+        "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkNTY4YjFlZDYyODljYjJlYjRjMDBjYTBlODc3NzFlZSIsInN1YiI6IjY1NzZhN2Q5YTg0YTQ3MmRlMmVlYTdlMyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.zzAgW4aI2oJFRgESaA1HVSv3ZKKQnEYm2I1zZwiouQs"
     ]
     
     func loadMovieLists(filter: String, completion: @escaping([Result]) -> Void){
@@ -38,6 +40,7 @@ class NetworkManager {
         AF.request(requestUrl).responseJSON { response in
             guard let data = response.data else {
                 print("Error: did not get Data")
+                print(components.url)
                 return
             }
             do{
@@ -358,6 +361,10 @@ class NetworkManager {
                         success,
                         let sessionId = responseData["session_id"] as? String
                     {
+                        KeychainWrapper.standard.set(sessionId, forKey: "SessionId")
+                        self.apiKey = KeychainWrapper.standard.string(forKey: "SessionId")
+                        self.isLoggedIn = true
+                        UserDefaults.standard.set(self.isLoggedIn, forKey: "isLoggedIn")
                         completion(.success(sessionId))
                     } else {
                         completion(.failure(.failedWith(reason: "Failed to create session")))
