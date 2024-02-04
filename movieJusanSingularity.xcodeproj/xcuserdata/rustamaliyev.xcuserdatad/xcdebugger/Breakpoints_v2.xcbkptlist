@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Bucket
+   uuid = "78830EB6-DC82-40D9-91D4-39307D9DCD30"
+   type = "1"
+   version = "2.0">
+   <Breakpoints>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "9FEA4018-CB29-4C12-BC99-C072978CBB7B"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "movieJusanSingularity/Network/NetworkManager.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "178"
+            endingLineNumber = "178"
+            landmarkName = "fetchVideos(id:completion:)"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "9FEA4018-CB29-4C12-BC99-C072978CBB7B - fcb953764c404d7b"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 @Sendable (Swift.Optional&lt;Foundation.Data&gt;, Swift.Optional&lt;__C.NSURLResponse&gt;, Swift.Optional&lt;Swift.Error&gt;) -&gt; () in movieJusanSingularity.NetworkManager.fetchVideos(id: Swift.Int, completion: (Swift.Array&lt;movieJusanSingularity.Video&gt;) -&gt; ()) -&gt; ()"
+                  moduleName = "movieJusanSingularity"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/rustamaliyev/Desktop/movieJusanSingularity/movieJusanSingularity/Network/NetworkManager.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "179"
+                  endingLineNumber = "179"
+                  offsetFromSymbolStart = "1204">
+               </Location>
+               <Location
+                  uuid = "9FEA4018-CB29-4C12-BC99-C072978CBB7B - 1ebf11fdbcfd50c3"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 @Swift.MainActor () -&gt; () in closure #1 @Sendable (Swift.Optional&lt;Foundation.Data&gt;, Swift.Optional&lt;__C.NSURLResponse&gt;, Swift.Optional&lt;Swift.Error&gt;) -&gt; () in movieJusanSingularity.NetworkManager.fetchVideos(id: Swift.Int, completion: (Swift.Array&lt;movieJusanSingularity.Video&gt;) -&gt; ()) -&gt; ()"
+                  moduleName = "movieJusanSingularity"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/rustamaliyev/Desktop/movieJusanSingularity/movieJusanSingularity/Network/NetworkManager.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "178"
+                  endingLineNumber = "178"
+                  offsetFromSymbolStart = "108">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+   </Breakpoints>
+</Bucket>
