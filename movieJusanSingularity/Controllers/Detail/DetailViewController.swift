@@ -9,15 +9,19 @@ import UIKit
 import SnapKit
 import Kingfisher
 import Cosmos
+import CoreData
 
 final class DetailViewController: BaseViewController {
 	
 	// MARK: - Properties
 	var movieID = Int()
+	var movieImage: String?
+	var movieName: String?
 	
 	// MARK: - Private properties
 	private var networkManager = NetworkManager.shared
 	private var voteAverage: Int = 0
+	private var watchListMovies: [NSManagedObject] = []
 	
 	private lazy var genres: [Genre] = [] {
 		didSet {
@@ -237,16 +241,38 @@ final class DetailViewController: BaseViewController {
 		return image
 	}()
 	
+	private lazy var addToWatchListButton: UIButton = {
+		let button = UIButton()
+		button.tintColor = .white
+		button.titleLabel?.font = .boldSystemFont(ofSize: 10)
+		button.addTarget(self, action: #selector(addToWatchList), for: .touchUpInside)
+		button.backgroundColor = #colorLiteral(red: 0.1011425927, green: 0.2329770327, blue: 0.9290834069, alpha: 1)
+		return button
+	}()
+	
+	private lazy var extraView: UIView = {
+		let view = UIView()
+		view.backgroundColor = .white
+		return view
+	}()
+	
 	// MARK: - Lifecycle
 	override func viewDidLoad() {
 		super.viewDidLoad()
-		
 		loadData()
 		setupNavigationBar()
 		setupViews()
 		setupConstraints()
+		loadMoviesFromWatchList()
+		buttonColorViewDidLoad()
+		self.tabBarController?.tabBar.isHidden = true
 	}
 	
+	override func viewWillLayoutSubviews() {
+		super.viewWillLayoutSubviews()
+		addToWatchListButton.layer.cornerRadius = 15
+	}
+
 	// MARK: - Navigation bar
 	private func setupNavigationBar() {
 		self.navigationItem.title = "Movie"
@@ -259,8 +285,40 @@ final class DetailViewController: BaseViewController {
 		navigationController?.navigationBar.tintColor = .black
 	}
 	
+	// MARK: - Action
+	
 	@objc func barButtonTapped() {
 		self.navigationController?.popViewController(animated: true)
+	}
+	
+	@objc func addToWatchList() {
+		 toggleButton()
+	}
+	
+	func buttonColorViewDidLoad() {
+		let isFavouriteMovie = !self.watchListMovies.filter({ ($0.value(forKey: "id") as? Int) == self.movieID}).isEmpty
+		
+		if isFavouriteMovie {
+			addToWatchListButton.backgroundColor = .red
+			addToWatchListButton.setTitle("Remove from Watch List", for: .normal)
+		} else {
+			addToWatchListButton.backgroundColor = #colorLiteral(red: 0.1011425927, green: 0.2329770327, blue: 0.9290834069, alpha: 1)
+			addToWatchListButton.setTitle("Add To Watch List", for: .normal)
+		}
+	}
+
+	private func toggleButton() {
+		
+		let isFavouriteMovie = !self.watchListMovies.filter({ ($0.value(forKey: "id") as? Int) == self.movieID}).isEmpty
+		if !isFavouriteMovie {
+			addToWatchListButton.backgroundColor = .red
+			addToWatchListButton.setTitle("Remove from Watch List", for: .normal)
+			saveMoviesFromWatchList(with: movieImage ?? "", movieTitle: movieName ?? "", movieID: movieID)
+		} else {
+			addToWatchListButton.backgroundColor = #colorLiteral(red: 0.1011425927, green: 0.2329770327, blue: 0.9290834069, alpha: 1)
+			addToWatchListButton.setTitle("Add To Watch List", for: .normal)
+			deleteMoviesFromWatchList(with: movieImage ?? "", movieTitle: movieName ?? "", movieID: movieID)
+		}
 	}
 	
 	// MARK: - Setup Views
@@ -269,7 +327,7 @@ final class DetailViewController: BaseViewController {
 		view.addSubview(scrollView)
 		scrollView.addSubview(contentView)
 		
-		[movieImageView, movieTitleLabel, releaseStack, overviewView, castTitleLabel, castCollectionView, linkTitleLabel, resourcesStackView].forEach {
+		[movieImageView, movieTitleLabel, releaseStack, overviewView, castTitleLabel, castCollectionView, linkTitleLabel, resourcesStackView, extraView, addToWatchListButton].forEach {
 			contentView.addArrangedSubview($0)
 		}
 		
@@ -308,6 +366,66 @@ final class DetailViewController: BaseViewController {
 		let facebookTapGR = UITapGestureRecognizer(target: self, action: #selector(self.facebookTapped))
 		facebookImageView.addGestureRecognizer(facebookTapGR)
 		facebookImageView.isUserInteractionEnabled = true
+	}
+	
+	// MARK: - Core
+	
+	private func loadMoviesFromWatchList() {
+		guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {return}
+		let manageContext = appDelegate.persistentContainer.viewContext
+		
+		let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "WatchListMovie")
+		
+		do {
+			watchListMovies = try manageContext.fetch(fetchRequest)
+//			movieTableView.reloadData()
+		} catch let error as NSError {
+			print("Could not fetch. Error: \(error)")
+		}
+	}
+	
+	private func saveMoviesFromWatchList(with movieImage: String, movieTitle: String, movieID: Int) {
+					guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
+					let managedContext = appDelegate.persistentContainer.viewContext
+					
+					guard let entity = NSEntityDescription.entity(
+							forEntityName: "WatchListMovie",
+							in: managedContext
+					) else { return }
+					
+					let favoriteMove = NSManagedObject(entity: entity, insertInto: managedContext)
+					favoriteMove.setValue(movieID, forKey: "id")
+					favoriteMove.setValue(movieTitle, forKey: "title")
+					favoriteMove.setValue(movieImage, forKey: "posterPath")
+					
+					do {
+							try managedContext.save()
+					} catch let error as NSError {
+							print("Could not save. Error: \(error)")
+					}
+			}
+	
+	private func deleteMoviesFromWatchList(with movieImage: String, movieTitle: String, movieID: Int) {
+		guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {return}
+		let manageContext = appDelegate.persistentContainer.viewContext
+		
+		let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "WatchListMovie")
+		let predicate1 = NSPredicate(format: "id == %@", "\(movieID)")
+		let predicate2 = NSPredicate(format: "title == %@", movieTitle)
+		let predicate3 = NSPredicate(format: "posterPath == %@", movieImage)
+		let predicateAll = NSCompoundPredicate(type: .and, subpredicates: [predicate1, predicate2, predicate3])
+		fetchRequest.predicate = predicateAll
+		
+		do {
+			let results = try manageContext.fetch(fetchRequest)
+			let data = results.first
+			if let data {
+				manageContext.delete(data)
+			}
+			try manageContext.save()
+		} catch let error as NSError {
+			print("Could not save. Error \(error)")
+		}
 	}
 	
 	// MARK: - Setup Constraints
@@ -381,6 +499,17 @@ final class DetailViewController: BaseViewController {
 		}
 		
 		resourcesStackView.snp.makeConstraints { make in
+			make.centerX.equalToSuperview()
+		}
+		
+		extraView.snp.makeConstraints { make in
+			make.trailing.leading.equalToSuperview()
+			make.height.equalTo(20)
+		}
+		
+		addToWatchListButton.snp.makeConstraints { make in
+			make.width.equalTo(147)
+			make.height.equalTo(33)
 			make.centerX.bottom.equalToSuperview()
 		}
 	}
@@ -400,7 +529,9 @@ final class DetailViewController: BaseViewController {
 			let url = URL(string: urlString)!
 			
 			self?.movieImageView.kf.setImage(with: url)
+			self?.movieImage = "https://image.tmdb.org/t/p/w200" + (posterPath)
 			self?.movieTitleLabel.text = movieDetails.originalTitle
+			self?.movieName = movieDetails.originalTitle
 			self?.releaseLabel.text = "Release date: \(movieDetails.releaseDate ?? "")"
 			self?.genres = movieDetails.genres
 			self?.raitingLabel.text = String(format: "%.1f", movieDetails.voteAverage ?? "") + "/10"

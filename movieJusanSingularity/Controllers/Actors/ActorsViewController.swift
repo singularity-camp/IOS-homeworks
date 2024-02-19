@@ -392,7 +392,6 @@ final class ActorsViewController: BaseViewController {
 	
 	@objc
 	func imdbTapped() {
-		
 		networkManager.fetchSocialMediaActors(id: personID) { socialMediaActors in
 			
 			let urlString = "https://www.imdb.com/name/" + "\(socialMediaActors.imdbID)"

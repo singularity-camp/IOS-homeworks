@@ -10,6 +10,8 @@ import Lottie
 
 class LoadingView: UIView {
 	
+	// MARK: - Constants
+	
 	private enum Constants {
 		static let animationViewSize: CGSize = .init(width: 95, height: 200)
 	}
@@ -31,13 +33,13 @@ class LoadingView: UIView {
 	}()
 	
 	private let backgroundAnimationView: LottieAnimationView = {
-			let view = LottieAnimationView()
-			let animation = LottieAnimation.named("snow")
-			view.animation = animation
-			view.contentMode = .scaleAspectFit
-			view.animationSpeed = 1.25
-			view.backgroundBehavior = .pauseAndRestore
-			return view
+		let view = LottieAnimationView()
+		let animation = LottieAnimation.named("snow")
+		view.animation = animation
+		view.contentMode = .scaleAspectFit
+		view.animationSpeed = 1.25
+		view.backgroundBehavior = .pauseAndRestore
+		return view
 	}()
 	
 	// MARK: - Inits
@@ -91,28 +93,27 @@ class LoadingView: UIView {
 	}
 	
 	private func hundleNewYearPeriod() {
-			let dateFormatter = DateFormatter()
-			dateFormatter.dateFormat = "dd/MM/yyyy"
-			dateFormatter.timeZone = TimeZone(identifier: "Asia/Almaty")
-			
-			let newYearDays = UserDefaults.standard.integer(forKey: "isNewYearPeriod")
-			let newYearSettedDay = UserDefaults.standard.string(forKey: "newYearSettedDay")
-			let currentDay = dateFormatter.string(from: Date())
-	
-			if newYearDays <= 2 && currentDay != newYearSettedDay {
-					UserDefaults.standard.set(newYearDays + 1, forKey: "isNewYearPeriod")
-					UserDefaults.standard.set(currentDay, forKey: "newYearSettedDay")
-			}
-			
-			let finalNewYearDays = UserDefaults.standard.integer(forKey: "isNewYearPeriod")
+		let dateFormatter = DateFormatter()
+		dateFormatter.dateFormat = "dd/MM/yyyy"
+		dateFormatter.timeZone = TimeZone(identifier: "Asia/Almaty")
 		
-			if finalNewYearDays <= 2 {
-					animationView.animation = LottieAnimation.named("cristmas")
-				  backgroundAnimationView.animation = LottieAnimation.named("snow")
-			} else {
-				backgroundAnimationView.removeFromSuperview()
-			}
-	
+		let newYearDays = UserDefaults.standard.integer(forKey: "isNewYearPeriod")
+		let newYearSettedDay = UserDefaults.standard.string(forKey: "newYearSettedDay")
+		let currentDay = dateFormatter.string(from: Date())
+		
+		if newYearDays <= 2 && currentDay != newYearSettedDay {
+			UserDefaults.standard.set(newYearDays + 1, forKey: "isNewYearPeriod")
+			UserDefaults.standard.set(currentDay, forKey: "newYearSettedDay")
+		}
+		
+		let finalNewYearDays = UserDefaults.standard.integer(forKey: "isNewYearPeriod")
+		
+		if finalNewYearDays <= 2 {
+			animationView.animation = LottieAnimation.named("cristmas")
+			backgroundAnimationView.animation = LottieAnimation.named("snow")
+		} else {
+			backgroundAnimationView.removeFromSuperview()
+		}
 	}
 	
 	// MARK: - Private methods

@@ -78,6 +78,18 @@ final class MovieTableViewCell: UITableViewCell {
 		favoriteIconImageView.image = isFavourite ? UIImage(named: "fullstar") : UIImage(named: "empty_star")
 	}
 	
+	func configureStar() {
+		favoriteIconImageView.isHidden = true
+	}
+	
+	func configureForSearch(_ model: SearchResult) {
+		movieTitleLabel.text = model.title
+		let urlString = "https://image.tmdb.org/t/p/w200" + (
+			model.posterPath)
+		let url = URL(string: urlString)!
+		movieImageView.kf.setImage(with: url)
+	}
+	
 	// MARK: - Setup Views
 	private func setupViews() {
 		contentView.backgroundColor = .clear

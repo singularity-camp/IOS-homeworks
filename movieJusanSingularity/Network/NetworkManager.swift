@@ -541,4 +541,39 @@ final class NetworkManager {
 			}
 		}
 	}
+	
+	func searchMovie(with query: String, completion: @escaping ([SearchResult]) -> Void) {
+		var components = urlComponents
+		components.path = "/3/search/movie"
+		
+		components.queryItems = [
+			URLQueryItem.init(name: "query", value: query),
+			URLQueryItem.init(name: "include_adult", value: "false"),
+			URLQueryItem.init(name: "language", value: "en-US"),
+			URLQueryItem.init(name: "page", value: "1")
+		]
+		guard let requestUrl = components.url else {
+			return
+		}
+		var requestHeaders = headers
+		requestHeaders["Content-Type"] = "application/json"
+		
+		AF.request(requestUrl, headers: requestHeaders).responseData { response in
+			guard let data = response.data else {
+				print("Error: Did not receive data")
+				return
+			}
+			
+			do {
+				let searchResult = try JSONDecoder().decode(Search.self, from: data)
+				DispatchQueue.main.async {
+					completion(searchResult.results)
+				}
+			} catch {
+				DispatchQueue.main.async {
+					completion([])
+				}
+			}
+		}
+	}
 }

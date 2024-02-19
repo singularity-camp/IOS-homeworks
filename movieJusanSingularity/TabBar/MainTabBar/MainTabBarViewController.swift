@@ -12,29 +12,28 @@ final class MainTabBarViewController: UITabBarController {
 	
 	// MARK: - Private properties
 	var isLogin = false
-	private let titles: [String] = ["Home", "For you", "Favorites", "Find", "Profile"]
+	private let titles: [String] = ["Home", "Favorites", "Watch list", "Find", "Profile"]
 	
 	private let icons: [UIImage?] = [
 		UIImage(named: "icon_home"),
 		UIImage(named: "star_icon"),
-		UIImage(named: "heart"),
+		UIImage(named: "watch_icon"),
 		UIImage(named: "icon_find"),
 		UIImage(named: "icon_profile")
 	]
 	
-	
 	private var allViewController = [
 		UINavigationController(rootViewController: MainViewController()),
-		ForYouViewController(),
 		UINavigationController(rootViewController: FavoriteViewController()),
-		SearchViewController(),
+		UINavigationController(rootViewController: WatchListViewController()),
+		UINavigationController(rootViewController: SearchViewController()),
 		UINavigationController(rootViewController: LoginViewController()),
 	]
 	
 	private var allViewController1 = [
 		UINavigationController(rootViewController: MainViewController()),
-		ForYouViewController(),
 		UINavigationController(rootViewController: FavoriteViewController()),
+		WatchListViewController(),
 		SearchViewController(),
 		ProfileViewController()
 	]

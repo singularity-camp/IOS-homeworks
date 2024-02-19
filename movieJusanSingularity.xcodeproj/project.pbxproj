@@ -36,7 +36,7 @@
 		83BB863A2B51329B00FE2D95 /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83BB86392B51329B00FE2D95 /* LoadingView.swift */; };
 		83BB86612B52706500FE2D95 /* movieJusanSingularity.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 83BB865F2B52706500FE2D95 /* movieJusanSingularity.xcdatamodeld */; };
 		83BB86642B52714400FE2D95 /* MainTabBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83BB86632B52714400FE2D95 /* MainTabBarViewController.swift */; };
-		83BB866A2B5276F600FE2D95 /* ForYouViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83BB86692B5276F600FE2D95 /* ForYouViewController.swift */; };
+		83BB866A2B5276F600FE2D95 /* WatchListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83BB86692B5276F600FE2D95 /* WatchListViewController.swift */; };
 		83BB866C2B52770D00FE2D95 /* FavoriteViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83BB866B2B52770D00FE2D95 /* FavoriteViewController.swift */; };
 		83BB866E2B52771A00FE2D95 /* SearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83BB866D2B52771A00FE2D95 /* SearchViewController.swift */; };
 		83BB86702B52772700FE2D95 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83BB866F2B52772700FE2D95 /* LoginViewController.swift */; };
@@ -58,11 +58,11 @@
 		83E3624B2B65667D0080D1F8 /* SnapKit-Dynamic in Frameworks */ = {isa = PBXBuildFile; productRef = 83E3624A2B65667D0080D1F8 /* SnapKit-Dynamic */; };
 		83E362532B6947260080D1F8 /* TextField+SecuryText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83E362522B6947260080D1F8 /* TextField+SecuryText.swift */; };
 		83E362562B6950380080D1F8 /* SwiftKeychainWrapper in Frameworks */ = {isa = PBXBuildFile; productRef = 83E362552B6950380080D1F8 /* SwiftKeychainWrapper */; };
-		83E3625A2B6A61760080D1F8 /* Session.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83E362592B6A61760080D1F8 /* Session.swift */; };
 		83F347F12B321A9B00C742F9 /* Data+PrettyJson.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83F347F02B321A9B00C742F9 /* Data+PrettyJson.swift */; };
 		83F347F32B321AE100C742F9 /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83F347F22B321AE100C742F9 /* NetworkManager.swift */; };
 		83F347F62B322D7000C742F9 /* SDWebImage in Frameworks */ = {isa = PBXBuildFile; productRef = 83F347F52B322D7000C742F9 /* SDWebImage */; };
 		83F347F82B322D7000C742F9 /* SDWebImageMapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 83F347F72B322D7000C742F9 /* SDWebImageMapKit */; };
+		83F6D1362B82F165009401D7 /* Search.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83F6D1352B82F165009401D7 /* Search.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -105,7 +105,7 @@
 		83BB86392B51329B00FE2D95 /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
 		83BB86602B52706500FE2D95 /* movieJusanSingularity.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = movieJusanSingularity.xcdatamodel; sourceTree = "<group>"; };
 		83BB86632B52714400FE2D95 /* MainTabBarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabBarViewController.swift; sourceTree = "<group>"; };
-		83BB86692B5276F600FE2D95 /* ForYouViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForYouViewController.swift; sourceTree = "<group>"; };
+		83BB86692B5276F600FE2D95 /* WatchListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchListViewController.swift; sourceTree = "<group>"; };
 		83BB866B2B52770D00FE2D95 /* FavoriteViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteViewController.swift; sourceTree = "<group>"; };
 		83BB866D2B52771A00FE2D95 /* SearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchViewController.swift; sourceTree = "<group>"; };
 		83BB866F2B52772700FE2D95 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
@@ -124,9 +124,9 @@
 		83E362412B62A2EF0080D1F8 /* APIResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIResult.swift; sourceTree = "<group>"; };
 		83E362452B65509E0080D1F8 /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
 		83E362522B6947260080D1F8 /* TextField+SecuryText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TextField+SecuryText.swift"; sourceTree = "<group>"; };
-		83E362592B6A61760080D1F8 /* Session.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Session.swift; sourceTree = "<group>"; };
 		83F347F02B321A9B00C742F9 /* Data+PrettyJson.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Data+PrettyJson.swift"; sourceTree = "<group>"; };
 		83F347F22B321AE100C742F9 /* NetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
+		83F6D1352B82F165009401D7 /* Search.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Search.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -234,7 +234,7 @@
 				83BB86682B5276C900FE2D95 /* Profile */,
 				83BB86672B5276B700FE2D95 /* Search */,
 				83BB86662B5276AC00FE2D95 /* Favorite */,
-				83BB86652B52769B00FE2D95 /* ForYou */,
+				83BB86652B52769B00FE2D95 /* WatchList */,
 			);
 			path = TabBar;
 			sourceTree = "<group>";
@@ -282,12 +282,12 @@
 			path = MainTabBar;
 			sourceTree = "<group>";
 		};
-		83BB86652B52769B00FE2D95 /* ForYou */ = {
+		83BB86652B52769B00FE2D95 /* WatchList */ = {
 			isa = PBXGroup;
 			children = (
-				83BB86692B5276F600FE2D95 /* ForYouViewController.swift */,
+				83BB86692B5276F600FE2D95 /* WatchListViewController.swift */,
 			);
-			path = ForYou;
+			path = WatchList;
 			sourceTree = "<group>";
 		};
 		83BB86662B5276AC00FE2D95 /* Favorite */ = {
@@ -376,7 +376,7 @@
 				83BB86222B4FF69A00FE2D95 /* Themes.swift */,
 				83E3623F2B62A1ED0080D1F8 /* RequestTokenModel.swift */,
 				83E362412B62A2EF0080D1F8 /* APIResult.swift */,
-				83E362592B6A61760080D1F8 /* Session.swift */,
+				83F6D1352B82F165009401D7 /* Search.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -500,14 +500,14 @@
 				83E362402B62A1ED0080D1F8 /* RequestTokenModel.swift in Sources */,
 				833632D82B39F629001DCE08 /* SocialMedia.swift in Sources */,
 				83BB866C2B52770D00FE2D95 /* FavoriteViewController.swift in Sources */,
-				83E3625A2B6A61760080D1F8 /* Session.swift in Sources */,
 				83C5F65D2B31FE5E0021D3BB /* UITableViewCell+Reusable.swift in Sources */,
 				83C5F6442B31EE0D0021D3BB /* MainViewController.swift in Sources */,
 				83BB866E2B52771A00FE2D95 /* SearchViewController.swift in Sources */,
 				833632DA2B3A9CED001DCE08 /* CastCollectionViewCell.swift in Sources */,
 				833633342B3D3782001DCE08 /* PhotoCollectionViewCell.swift in Sources */,
 				833633322B3D1EDA001DCE08 /* ActorsBio.swift in Sources */,
-				83BB866A2B5276F600FE2D95 /* ForYouViewController.swift in Sources */,
+				83F6D1362B82F165009401D7 /* Search.swift in Sources */,
+				83BB866A2B5276F600FE2D95 /* WatchListViewController.swift in Sources */,
 				8320FA5B2B35FDCB00AC9BCB /* MovieDetail.swift in Sources */,
 				8320FA5D2B35FE3C00AC9BCB /* Genres.swift in Sources */,
 				83C5F6402B31EE0D0021D3BB /* AppDelegate.swift in Sources */,

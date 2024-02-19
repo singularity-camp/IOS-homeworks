@@ -1,36 +1,28 @@
 //
-//  SearchViewController.swift
+//  ForYouViewController.swift
 //  movieJusanSingularity
 //
 //  Created by Mariya Aliyeva on 13.01.2024.
 //
 
 import UIKit
+import CoreData
 
-final class SearchViewController: UIViewController, UISearchControllerDelegate {
-	
+final class WatchListViewController: UIViewController {
+
 	// MARK: - Private properties
-	private var networkManager = NetworkManager.shared
-	
-	private var searchMovies: [SearchResult] = [] {
+	private var moviesFromWatchList: [NSManagedObject] = [] {
 		didSet {
 			self.movieTableView.reloadData()
 		}
 	}
 	
 	// MARK: - UI
-	
 	private var titleLabel: UILabel = {
 		let label = UILabel()
-		label.text = "Search"
+		label.text = "Watch List"
 		label.font = UIFont.systemFont(ofSize: 42, weight: .bold)
 		return label
-	}()
-	
-	private lazy var searchBar: UISearchBar = {
-		let search = UISearchBar()
-		search.delegate = self
-		return search
 	}()
 	
 	private lazy var movieTableView: UITableView = {
@@ -50,12 +42,31 @@ final class SearchViewController: UIViewController, UISearchControllerDelegate {
 		setupViews()
 		setupConstraints()
 	}
-
+	
+	override func viewWillAppear(_ animated: Bool) {
+		super.viewWillAppear(animated)
+		loadMovies()
+		self.tabBarController?.tabBar.isHidden = false
+	}
+	
+	// MARK: - Core
+	private func loadMovies() {
+		guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
+		let managedContext = appDelegate.persistentContainer.viewContext
+		
+		let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "WatchListMovie")
+		do {
+			moviesFromWatchList = try managedContext.fetch(fetchRequest)
+		} catch let error as NSError {
+			print("Could not fetch. Error: \(error)")
+		}
+	}
+	
 	// MARK: - Setup Views
 	private func setupViews() {
 		view.backgroundColor = .white
 		
-		[titleLabel, searchBar, movieTableView].forEach {
+		[titleLabel, movieTableView].forEach {
 			view.addSubview($0)
 		}
 	}
@@ -68,57 +79,38 @@ final class SearchViewController: UIViewController, UISearchControllerDelegate {
 			make.centerX.equalToSuperview()
 		}
 		
-		searchBar.snp.makeConstraints { make in
-			make.top.equalTo(titleLabel.snp.bottom).offset(8)
-			make.leading.trailing.equalToSuperview().inset(16)
-		}
-		
 		movieTableView.snp.makeConstraints { make in
-			make.top.equalTo(searchBar.snp.bottom).offset(48)
+			make.top.equalTo(titleLabel.snp.bottom).offset(16)
 			make.leading.trailing.bottom.equalToSuperview()
 		}
 	}
 }
-
-// MARK: - UISearchBarDelegate
-extension SearchViewController: UISearchBarDelegate {
-	
-	func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-		
-		guard let query = searchBar.text,
-					!query.trimmingCharacters(in: .whitespaces).isEmpty,
-					query.trimmingCharacters(in: .whitespaces).count >= 3
-		else {return}
-		
-		networkManager.searchMovie(with: query) { [weak self] result in
-			self?.searchMovies = result
-		}
-	}
-}
-
 // MARK: - UITableViewDataSource
-extension SearchViewController: UITableViewDataSource {
+extension WatchListViewController: UITableViewDataSource {
 	
 	func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-		return searchMovies.count
+		return moviesFromWatchList.count
 	}
 	
 	func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 		let cell = tableView.dequeueReusableCell(forIndexPath: indexPath) as MovieTableViewCell
-		let movie = searchMovies[indexPath.row]
-		cell.configureForSearch(movie)
+		let movie = moviesFromWatchList[indexPath.row]
+		let title = movie.value(forKeyPath: "title") as? String
+		let posterPath = movie.value(forKeyPath: "posterPath") as? String
+		cell.configureFavouriteMovie(with: title ?? "", and: posterPath ?? "")
 		cell.configureStar()
 		return cell
 	}
 }
 
 // MARK: - UITableViewDelegate
-extension SearchViewController: UITableViewDelegate {
+extension WatchListViewController: UITableViewDelegate {
 	
 	func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 		let movieDetailsController = DetailViewController()
-		let movie = searchMovies[indexPath.row]
-		movieDetailsController.movieID = movie.id
+		let movie = moviesFromWatchList[indexPath.row]
+		let id = movie.value(forKeyPath: "id") as? Int
+		movieDetailsController.movieID = id ?? 0
 		self.navigationController?.pushViewController(movieDetailsController, animated: true)
 	}
 }
